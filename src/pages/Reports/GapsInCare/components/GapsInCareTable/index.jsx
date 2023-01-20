@@ -32,7 +32,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 		perPage: 50
 	});
 
-	const filter_meature1 = makeDropdown(MEM_GENDER);
+	//const filter_meature1 = makeDropdown(MEM_GENDER);
 	const filter_meature3 = makeDropdown(PROVSPEC);
 	const filter1 = makeDropdown(PROVID_PROV);
 	const filter2 = makeDropdown(MEM_FULL_PROV);
