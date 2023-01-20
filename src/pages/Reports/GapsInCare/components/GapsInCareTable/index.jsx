@@ -121,7 +121,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							filterSearch: true,
 							onFilter: (value, record) => {
 								if (record.PROV_FULLNAME !== null)
-									return record.PROV_FULLNAME.toString().includes(value);
+									return record.PROV_FULLNAME.includes(value);
 							},
 							render: (text, record) => (
 								<div
@@ -193,7 +193,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							filterSearch: true,
 							onFilter: (value, record) => {
 								if (record.PROVIDER_ID !== null)
-									return record.PROVIDER_ID.toString().includes(value);
+									return record.PROVIDER_ID.includes(value);
 							},
 							render: (text, record) => (
 								<div
