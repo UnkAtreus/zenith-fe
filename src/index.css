@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+	margin: 0;
+}
+/* 
+.ant-tabs-tab-active {
+  border-bottom: 2px solid #1890ff;
+} */
+
+.ant-table-thead tr .ant-table-cell.rate-summary-table-column {
+	background-color: #e0e7ff !important;
+}
+
+.ant-table-thead tr .ant-table-cell.member-list-table-column {
+	background-color: #d1fae5 !important;
+}
+
+.ant-table-thead tr .ant-table-cell.provider-list-table-column {
+	background-color: #ede9fe !important;
+}
+
+.ant-table-thead tr .ant-table-cell.gaps-in-care-table-column {
+	background-color: #ccfbf1 !important;
+}
+
+.provider-list
+	.ant-spin-nested-loading
+	.ant-spin-container
+	.ant-table.ant-table-scroll-horizontal
+	.ant-table-container
+	.ant-table-content
+	table
+	.ant-table-thead
+	tr
+	.ant-table-cell.ant-table-row-expand-icon-cell {
+	background-color: #ede9fe !important;
+}
+
+.gaps-in-care
+	.ant-spin-nested-loading
+	.ant-spin-container
+	.ant-table.ant-table-ping-right.ant-table-scroll-horizontal
+	.ant-table-container
+	.ant-table-content
+	table
+	.ant-table-thead
+	tr
+	.ant-table-cell.ant-table-row-expand-icon-cell {
+	background-color: #ccfbf1 !important;
+}
+
+#dashboard-content * .ant-statistic-title,
+#dashboard-content * .ant-statistic-content {
+	color: white !important;
+}
+
+#goalTracker-content * .ant-statistic-title,
+#goalTracker-content * .ant-statistic-content {
+	color: white !important;
+}
