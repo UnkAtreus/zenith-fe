@@ -119,7 +119,10 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							width: 110,
 							filters: filter2,
 							filterSearch: true,
-							onFilter: (value, record) => record.PROV_FULLNAME.startsWith(value),
+							onFilter: (value, record) => {
+								if (record.PROV_FULLNAME !== null)
+									return record.PROV_FULLNAME.toString().includes(value);
+							},
 							render: (text, record) => (
 								<div
 									key={text + record}
@@ -163,7 +166,10 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							filters: filter_meature3,
 							filterMode: 'tree',
 							filterSearch: true,
-							onFilter: (value, record) => record.PROVSPEC.includes(value),
+							onFilter: (value, record) => {
+								if (record.PROVSPEC !== null)
+									return record.PROVSPEC.toString().includes(value);
+							},
 							render: (text, record) => (
 								<div
 									key={text + record}
@@ -185,7 +191,10 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							// render: (text, record) => <div>1234</div>
 							filters: filter1,
 							filterSearch: true,
-							onFilter: (value, record) => record.PROVIDER_ID.includes(value),
+							onFilter: (value, record) => {
+								if (record.PROVIDER_ID !== null)
+									return record.PROVIDER_ID.toString().includes(value);
+							},
 							render: (text, record) => (
 								<div
 									key={text + record}
