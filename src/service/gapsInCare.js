@@ -8,6 +8,13 @@ const GapsInCare = {
 
 		return $data;
 	},
+	async exportList(page = 1, perPage = 50) {
+		const { data } = await axiosAuthInstance.get(`gaps-in-care?type=export&page=${page}&perPage=${perPage}`);
+
+		const $data = data.data;
+
+		return $data;
+	},
 	async getId(tin, provider_id, chvmemnbr) {
 		const { data } = await axiosAuthInstance.get(
 			`gaps-in-care-list?tin=${tin}&provider_id=${provider_id}&chvmemnbr=${chvmemnbr}`

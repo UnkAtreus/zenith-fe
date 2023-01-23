@@ -6,7 +6,7 @@ import { Excel } from 'antd-table-saveas-excel';
 import { useNavigate } from 'react-router-dom';
 
 import RateSummaryService from '@/service/rateSummary';
-import { MEASURE_ID, RATE_SUMMARY, SUB_MEASURE } from '@/store/table_column';
+import { MEASURE, MEASURE_ID, RATE_SUMMARY, SUB_MEASURE } from '@/store/table_column';
 import makeDropdown from '@/utilities/makeDropdown';
 
 function RateSummaryTable({ setStep, setRateSummaryRecord }) {
@@ -85,28 +85,55 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 	};
 
 	const fetchData = (page, perPage) => {
+		setPagination({ ...pagination, current: page, perPage });
+		// setIsLoading(true);
+		// const popId = JSON.parse(localStorage.getItem('population')).DBLREP_MASTER_POP_ID;
+		// if (popId) {
+		// 	RateSummaryService.list(popId, page, perPage)
+		// 		.then(({ data, total }) => {
+		// 			setData(data);
+		// 			setPagination({
+		// 				total,
+		// 				current: page,
+		// 				perPage
+		// 			});
+		// 		})
+		// 		.finally(() => {
+		// 			setIsLoading(false);
+		// 		});
+		// }
+	};
+
+	async function fetchAllData() {
 		setIsLoading(true);
 		const popId = JSON.parse(localStorage.getItem('population')).DBLREP_MASTER_POP_ID;
 		if (popId) {
-			RateSummaryService.list(popId, page, perPage)
-				.then(({ data, total }) => {
-					setData(data);
-					setPagination({
-						total,
-						current: page,
-						perPage
-					});
-				})
-				.finally(() => {
-					setIsLoading(false);
+			const { total } = await RateSummaryService.list(popId);
+			const totalPages = Math.ceil(total / 1000.0);
+			const texts = await Promise.all(
+				Array(totalPages)
+					.fill(0)
+					.map(async (u, i) => {
+						const { data } = await RateSummaryService.list(popId, i + 1, 1000);
+						return data;
+					})
+			);
+
+			const data = [];
+			texts.forEach((d, i) => {
+				d.forEach(item => {
+					data.push(item);
 				});
+			});
+			setData(data);
 		}
-	};
+	}
 
 	useEffect(() => {
 		setIsLoading(true);
 		const popId = JSON.parse(localStorage.getItem('population')).DBLREP_MASTER_POP_ID;
 		if (popId) {
+			fetchAllData();
 			RateSummaryService.list(popId)
 				.then(({ data, columns, total }) => {
 					setData(data);
@@ -131,7 +158,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 										onClick={() => setStep(1)}
 										className="cursor-pointer text-blue-500"
 									>
-										{text}
+										{MEASURE[record.SHORT_HEDIS_MEASURE]}
 									</div>
 								)
 							};
@@ -277,6 +304,9 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 						rowKey={record => record.SUB_MEASURE + Math.random() * 1000000}
 						columns={column}
 						dataSource={data}
+						onChange={(pagination, filters, sorter, extra) => {
+							setPagination({ ...pagination, total: extra.currentDataSource.length });
+						}}
 						onRow={(record, rowIndex) => {
 							return {
 								onClick: event => {

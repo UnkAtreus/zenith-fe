@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { Button, PageHeader, Breadcrumb, Table, Row, Statistic, Col } from 'antd';
+import { Button, PageHeader, Breadcrumb, Table, Row, Statistic, Col, message } from 'antd';
 import { Excel } from 'antd-table-saveas-excel';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
@@ -25,7 +25,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 	const [explainableData, setExplainableData] = useState([]);
 	const [explainableColumns, setExplainableColumns] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
-	const [isLoadingExplain, setIsLoadingExplain] = useState(false);
+	const [isLoadingExport, setIsLoadingExport] = useState(false);
 	const [pagination, setPagination] = useState({
 		total: 0,
 		current: 1,
@@ -39,9 +39,32 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 
 	const navigate = useNavigate();
 
-	const haldleExport = () => {
+	const haldleExport = async () => {
+		setIsLoadingExport(true);
 		const excel = new Excel();
-		excel.addSheet('GapsInCare').addColumns(column).addDataSource(data).saveAs('GapsInCare List.xlsx');
+
+		const { total, columns } = await GapsInCare.exportList();
+		const totalPages = Math.ceil(total / 500.0);
+		const texts = await Promise.all(
+			Array(totalPages)
+				.fill(0)
+				.map(async (u, i) => {
+					const { data } = await GapsInCare.exportList(i + 1, 500);
+					return data;
+				})
+		);
+
+		const data = [];
+		texts.forEach((d, i) => {
+			d.forEach(item => {
+				data.push(item);
+			});
+		});
+
+		console.log(`export step 1`);
+		excel.addSheet('GapsInCare').addColumns(columns).addDataSource(data).saveAs('GapsInCare List.xlsx');
+		console.log(`finish export`);
+		setIsLoadingExport(false);
 	};
 
 	const fetchData = (page, perPage) => {
@@ -234,7 +257,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 					</Breadcrumb>
 				}
 				extra={[
-					<Button onClick={() => haldleExport()} key="1" type="primary">
+					<Button onClick={() => haldleExport()} key="1" type="primary" loading={isLoadingExport}>
 						Export
 					</Button>
 				]}
@@ -266,14 +289,19 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							onExpand: async (expand, record, index) => {
 								const key_data = `${record.TIN}_${record.PROVIDER_ID}_${record.CHVMEMNBR}_${record.PROV_FULLNAME}_${record.PROV_ADDRESS}_${record.PROVSPEC}`;
 								if (explainableData.findIndex(item => item[0] === key_data) < 0) {
-									GapsInCare.getId(record.TIN, record.PROVIDER_ID, record.CHVMEMNBR, record.PROV_FULLNAME, record.PROVSPEC, record.PROV_ADDRESS).then(
-										({ data, columns }) => {
-											const input_key = [key_data, data];
-											const column_key = [key_data, columns];
-											setExplainableData([...explainableData, input_key]);
-											setExplainableColumns([...explainableColumns, column_key]);
-										}
-									);
+									GapsInCare.getId(
+										record.TIN,
+										record.PROVIDER_ID,
+										record.CHVMEMNBR,
+										record.PROV_FULLNAME,
+										record.PROVSPEC,
+										record.PROV_ADDRESS
+									).then(({ data, columns }) => {
+										const input_key = [key_data, data];
+										const column_key = [key_data, columns];
+										setExplainableData([...explainableData, input_key]);
+										setExplainableColumns([...explainableColumns, column_key]);
+									});
 								}
 							},
 
@@ -284,10 +312,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 
 								if (data_index > -1 && explainableColumns[column_index][1].length > 0) {
 									return (
-										<div
-											className="flex "
-											key={`expanded_${index}`}
-										>
+										<div className="flex " key={`expanded_${index}`}>
 											<Table
 												bordered
 												rowKey={record => `${record.id}_expanded`}
@@ -302,10 +327,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 									);
 								} else {
 									return (
-										<div
-											className="flex "
-											key={`loading_${index}`}
-										>
+										<div className="flex " key={`loading_${index}`}>
 											Loadong...
 										</div>
 									);
