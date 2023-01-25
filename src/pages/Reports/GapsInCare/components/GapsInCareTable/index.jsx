@@ -328,7 +328,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 								} else {
 									return (
 										<div className="flex " key={`loading_${index}`}>
-											Loadong...
+											No Data.
 										</div>
 									);
 								}
