@@ -371,6 +371,9 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				extra={[
 					<Button onClick={() => haldleExport()} key="1" type="primary">
 						Export Provider Rate Sheet
+					</Button>,
+					<Button>
+						Export Provider Gaps List
 					</Button>
 				]}
 			></PageHeader>
