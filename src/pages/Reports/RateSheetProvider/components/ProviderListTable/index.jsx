@@ -90,24 +90,6 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				dataIndex: 'CURRENT_YEAR_RATE',
 				title: 'Current Year Rate',
 				className: 'provider-list-table-column'
-			},
-			{
-				key: 'PRIOR_YEAR_RATE',
-				dataIndex: 'PRIOR_YEAR_RATE',
-				title: 'Prior Year Rate',
-				className: 'provider-list-table-column'
-			},
-			{
-				key: 'GOAL',
-				dataIndex: 'GOAL',
-				title: 'Goal',
-				className: 'provider-list-table-column'
-			},
-			{
-				key: 'TO_REACH_GOAL',
-				dataIndex: 'TO_REACH_GOAL',
-				title: 'To reach goal',
-				className: 'provider-list-table-column'
 			}
 		];
 		excel.addSheet('providerList').addColumns(columns).addDataSource(filterData).saveAs('Provider List.xlsx');
@@ -369,12 +351,10 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					</Breadcrumb>
 				}
 				extra={[
-					<Button onClick={() => haldleExport()} key="1" type="primary">
+					<Button onClick={() => haldleExport()} key="btn_1" type="primary">
 						Export Provider Rate Sheet
 					</Button>,
-					<Button>
-						Export Provider Gaps List
-					</Button>
+					<Button key={'btn_2'}>Export Provider Gaps List</Button>
 				]}
 			></PageHeader>
 			<div className="px-6 pb-6">
