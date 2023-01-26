@@ -13,6 +13,10 @@ import makeDropdown from '@/utilities/makeDropdown';
 function ProviderListTable({ setStep, setProviderListRecord }) {
 	const [data, setData] = useState([]);
 	const [filterData, setFilterData] = useState([]);
+	const [filter, setFilter] = useState({
+		PROVIDER_ID: [],
+		HEDIS_MEASURE: []
+	});
 	const [column, setColumn] = useState([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [pagination, setPagination] = useState({
@@ -93,6 +97,101 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 			}
 		];
 		excel.addSheet('providerList').addColumns(columns).addDataSource(filterData).saveAs('Provider List.xlsx');
+	};
+
+	const haldleExportMember = async () => {
+		const excel = new Excel();
+		if (filter.HEDIS_MEASURE.length > 0 && filter.PROVIDER_ID.length > 0) {
+			console.log(filterData);
+			const provider_id = [];
+			const measure = [];
+			const numtag = [];
+			filterData.forEach(data => {
+				provider_id.push(data.PROVIDER_ID);
+				measure.push(data.MEASURE);
+				numtag.push(data.NUMTAG);
+			});
+
+			const { data: filterdata } = await ProviderList.getMemberList(
+				'',
+				[...new Set(provider_id)].join(','),
+				'',
+				[...new Set(measure)].join(','),
+				[...new Set(numtag)].join(','),
+				1,
+				1000
+			);
+
+			const columns = [
+				{
+					key: 'CHVMEMNBR',
+					dataIndex: 'CHVMEMNBR',
+					title: 'Memnbr'
+				},
+				{
+					key: 'FULLNAME',
+					dataIndex: 'FULLNAME',
+					title: 'Fullname'
+				},
+				{
+					key: 'DOB',
+					dataIndex: 'DOB',
+					title: 'Date of Birth'
+				},
+				{
+					key: 'CHVMEMGENDER',
+					dataIndex: 'CHVMEMGENDER',
+					title: 'Memgender'
+				},
+				{
+					key: 'CHVMEMADDRESS',
+					dataIndex: 'CHVMEMADDRESS',
+					title: 'Memaddress'
+				},
+				{
+					key: 'CHVMEMPHONE1',
+					dataIndex: 'CHVMEMPHONE1',
+					title: 'Memphone1'
+				},
+				{
+					key: 'CHVMEM_EMAIL',
+					dataIndex: 'CHVMEM_EMAIL',
+					title: 'Mem email'
+				},
+				{
+					key: 'CHVRACE',
+					dataIndex: 'CHVRACE',
+					title: 'Race'
+				},
+				{
+					key: 'CHVETHNICITY',
+					dataIndex: 'CHVETHNICITY',
+					title: 'Ethnicity'
+				},
+				{
+					key: 'CHVSPOKEN_LANGUAGE',
+					dataIndex: 'CHVSPOKEN_LANGUAGE',
+					title: 'Spoken language'
+				},
+				{
+					key: 'COMPLIANT_STATUS',
+					dataIndex: 'COMPLIANT_STATUS',
+					title: 'Compliant status',
+					render: (text, record) => {
+						if (record.COMPLIANTSTATUS === 1) {
+							return <div>Compliant</div>;
+						} else {
+							return <div>Not Compliant</div>;
+						}
+					}
+				}
+			];
+			excel
+				.addSheet('providerList')
+				.addColumns(columns)
+				.addDataSource(filterdata)
+				.saveAs('Provider Gaps List.xlsx');
+		}
 	};
 
 	const fetchData = (page, perPage) => {
@@ -354,7 +453,9 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					<Button onClick={() => haldleExport()} key="btn_1" type="primary">
 						Export Provider Rate Sheet
 					</Button>,
-					<Button key={'btn_2'}>Export Provider Gaps List</Button>
+					<Button key={'btn_2'} onClick={() => haldleExportMember()}>
+						Export Provider Gaps List
+					</Button>
 				]}
 			></PageHeader>
 			<div className="px-6 pb-6">
@@ -364,6 +465,10 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 						columns={column}
 						dataSource={data}
 						onChange={(pagination, filters, sorter, extra) => {
+							console.log(filters, extra);
+							setFilter(prev => {
+								return { ...prev, ...filters };
+							});
 							setFilterData(extra.currentDataSource);
 							setPagination({ ...pagination, total: extra.currentDataSource.length });
 						}}
