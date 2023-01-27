@@ -174,6 +174,16 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					title: 'Spoken language'
 				},
 				{
+					key: 'MEASURE',
+					dataIndex: 'MEASURE',
+					title: 'Measure'
+				},
+				{
+					key: 'NUMTAG',
+					dataIndex: 'NUMTAG',
+					title: 'Numtag'
+				},
+				{
 					key: 'COMPLIANT_STATUS',
 					dataIndex: 'COMPLIANT_STATUS',
 					title: 'Compliant status',
@@ -186,6 +196,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					}
 				}
 			];
+
 			excel
 				.addSheet('providerList')
 				.addColumns(columns)
