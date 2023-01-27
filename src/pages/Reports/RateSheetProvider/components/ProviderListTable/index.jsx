@@ -101,7 +101,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 
 	const haldleExportMember = async () => {
 		const excel = new Excel();
-		if (filter.HEDIS_MEASURE.length > 0 && filter.PROVIDER_ID.length > 0) {
+		if (filter.PROVIDER_ID.length > 0) {
 			console.log(filterData);
 			const provider_id = [];
 			const measure = [];
