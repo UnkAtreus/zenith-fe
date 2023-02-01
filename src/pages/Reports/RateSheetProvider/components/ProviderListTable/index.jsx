@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import ProviderList from '@/service/providerList';
 import { GAPS_IN_CARE, PROVID_PROV, MEM_FULL_PROV, MEASURE_PROV, MEASURE } from '@/store/table_column';
 import makeColumn from '@/utilities/makeColumn';
-import makeDropdown from '@/utilities/makeDropdown';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function ProviderListTable({ setStep, setProviderListRecord }) {
 	const [data, setData] = useState([]);
@@ -21,9 +21,11 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 		perPage: 50
 	});
 
-	const filter_1 = makeDropdown(PROVID_PROV);
-	const filter_2 = makeDropdown(MEM_FULL_PROV);
-	const filter_3 = makeDropdown(MEASURE_PROV);
+	const [filter, setFilter] = useState({
+		PROVIDER_ID: [],
+		FULLNAME: [],
+		HEDIS_MEASURE: []
+	});
 
 	const navigate = useNavigate();
 
@@ -218,7 +220,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 
 	async function fetchAllData() {
 		setIsLoading(true);
-		const { total } = await ProviderList.list();
+		const { total, columns } = await ProviderList.list();
 		const totalPages = Math.ceil(total / 1000);
 		const texts = await Promise.all(
 			Array(totalPages)
@@ -235,208 +237,194 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				data.push(item);
 			});
 		});
+		setFilter({
+			PROVIDER_ID: makeDropdown(makeFilterList(data, 'PROVIDER_ID')),
+			FULLNAME: makeDropdown(makeFilterList(data, 'FULLNAME')),
+			HEDIS_MEASURE: makeDropdown(makeFilterList(data, 'HEDIS_MEASURE'))
+		});
 		setData(data);
 		setFilterData(data);
+		setPagination({
+			total,
+			current: 1,
+			perPage: 50
+		});
+		const column = columns.map(col => {
+			if (col.key === 'HEDIS_MEASURE') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					width: 360,
+					filters: makeDropdown(makeFilterList(data, 'HEDIS_MEASURE')),
+					filterSearch: true,
+					onFilter: (value, record) => {
+						if (record.HEDIS_MEASURE !== null) return record.HEDIS_MEASURE.toString().includes(value);
+					},
+					render: (text, record) => {
+						if (MEASURE[record.MEASURE]) {
+							return (
+								<div
+									key={text + record}
+									onClick={() => setStep(1)}
+									className="cursor-pointer text-blue-500"
+								>
+									{MEASURE[record.MEASURE]}
+								</div>
+							);
+						} else {
+							return (
+								<div
+									key={text + record}
+									onClick={() => setStep(1)}
+									className="cursor-pointer text-blue-500"
+								>
+									{record.MEASURE}
+								</div>
+							);
+						}
+					}
+				};
+			}
+
+			if (col.key === 'DATE_OF_BIRTH') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => {
+						if (text) {
+							return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
+						}
+					}
+				};
+			}
+
+			if (col.key === 'NUMTAG') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => {
+						return <div>{text}</div>;
+					}
+				};
+			}
+
+			if (col.key === 'DEN') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					title: 'Den.'
+					// render: (text, record) => {
+					// 	return <div>0</div>;
+					// }
+				};
+			}
+			if (col.key === 'NUM') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					title: 'Num.'
+					// render: (text, record) => {
+					// 	return <div>0</div>;
+					// }
+				};
+			}
+
+			if (col.key === 'CURRENT_YEAR_RATE') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => (
+						<div key={text + record} className=" whitespace-nowrap">
+							{((record.NUM / record.DEN) * 100).toFixed(1)} %
+						</div>
+					)
+				};
+			}
+			if (col.key === 'SHORT_HEDIS_MEASURE') {
+				return {
+					...col,
+					className: 'hidden'
+				};
+			}
+			if (col.key === 'PRIOR_YEAR_RATE') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => <div>0.0%</div>
+					// <div key={text + record} className=" whitespace-nowrap">
+					// 	{(text * 100).toFixed(1)} %
+					// </div>
+				};
+			}
+			if (col.key === 'GOAL') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => (
+						<div>0.0%</div>
+						// <div key={text + record} className=" whitespace-nowrap">
+						// 	{(text * 100).toFixed(1)} %
+						// </div>
+					)
+				};
+			}
+			if (col.key === 'TO_REACH_GOAL') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					render: (text, record) => (
+						<div>0.0%</div>
+						// <div key={text + record}>
+						// 	{Math.ceil(
+						// 		record.GOAL * (parseFloat(record.DENOMINATOR) - parseFloat(record.NUMERATOR))
+						// 	) || 0}
+						// </div>
+					),
+					title: 'To reach goal'
+				};
+			}
+
+			if (col.key === 'PROVIDER_ID') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					filters: makeDropdown(makeFilterList(data, 'PROVIDER_ID')),
+					filterSearch: true,
+					onFilter: (value, record) => record.PROVIDER_ID.includes(value),
+					render: (text, record) => (
+						<div key={text + record} onClick={() => setStep(1)} className="cursor-pointer text-blue-500">
+							{text}
+						</div>
+					)
+				};
+			}
+
+			if (col.key === 'FULLNAME') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					filters: makeDropdown(makeFilterList(data, 'FULLNAME')),
+					filterSearch: true,
+					onFilter: (value, record) => record.FULLNAME.includes(value),
+					render: (text, record) => (
+						<div key={text + record} onClick={() => setStep(1)} className="cursor-pointer text-blue-500">
+							{text}
+						</div>
+					)
+				};
+			}
+			return {
+				...col,
+				className: 'provider-list-table-column'
+			};
+		});
+		setColumn(column);
+
+		setIsLoading(false);
 	}
 
 	useEffect(() => {
-		setIsLoading(true);
-
 		fetchAllData();
-
-		ProviderList.list()
-			.then(({ data, total, columns }) => {
-				console.log(data);
-				setData(data);
-				setFilterData(data);
-				setPagination({
-					total,
-					current: 1,
-					perPage: 50
-				});
-				const column = columns.map(col => {
-					if (col.key === 'HEDIS_MEASURE') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							width: 360,
-							filters: filter_3,
-							filterSearch: true,
-							onFilter: (value, record) => {
-								if (record.HEDIS_MEASURE !== null)
-									return record.HEDIS_MEASURE.toString().includes(value);
-							},
-							render: (text, record) => {
-								if (MEASURE[record.MEASURE]) {
-									return (
-										<div
-											key={text + record}
-											onClick={() => setStep(1)}
-											className="cursor-pointer text-blue-500"
-										>
-											{MEASURE[record.MEASURE]}
-										</div>
-									);
-								} else {
-									return (
-										<div
-											key={text + record}
-											onClick={() => setStep(1)}
-											className="cursor-pointer text-blue-500"
-										>
-											{record.MEASURE}
-										</div>
-									);
-								}
-							}
-						};
-					}
-
-					if (col.key === 'DATE_OF_BIRTH') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => {
-								if (text) {
-									return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
-								}
-							}
-						};
-					}
-
-					if (col.key === 'NUMTAG') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => {
-								return <div>{text}</div>;
-							}
-						};
-					}
-
-					if (col.key === 'DEN') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							title: 'Den.'
-							// render: (text, record) => {
-							// 	return <div>0</div>;
-							// }
-						};
-					}
-					if (col.key === 'NUM') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							title: 'Num.'
-							// render: (text, record) => {
-							// 	return <div>0</div>;
-							// }
-						};
-					}
-
-					if (col.key === 'CURRENT_YEAR_RATE') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => (
-								<div key={text + record} className=" whitespace-nowrap">
-									{((record.NUM / record.DEN) * 100).toFixed(1)} %
-								</div>
-							)
-						};
-					}
-					if (col.key === 'SHORT_HEDIS_MEASURE') {
-						return {
-							...col,
-							className: 'hidden'
-						};
-					}
-					if (col.key === 'PRIOR_YEAR_RATE') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => <div>0.0%</div>
-							// <div key={text + record} className=" whitespace-nowrap">
-							// 	{(text * 100).toFixed(1)} %
-							// </div>
-						};
-					}
-					if (col.key === 'GOAL') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => (
-								<div>0.0%</div>
-								// <div key={text + record} className=" whitespace-nowrap">
-								// 	{(text * 100).toFixed(1)} %
-								// </div>
-							)
-						};
-					}
-					if (col.key === 'TO_REACH_GOAL') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => (
-								<div>0.0%</div>
-								// <div key={text + record}>
-								// 	{Math.ceil(
-								// 		record.GOAL * (parseFloat(record.DENOMINATOR) - parseFloat(record.NUMERATOR))
-								// 	) || 0}
-								// </div>
-							),
-							title: 'To reach goal'
-						};
-					}
-
-					if (col.key === 'PROVIDER_ID') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							filters: filter_1,
-							filterSearch: true,
-							onFilter: (value, record) => record.PROVIDER_ID.includes(value),
-							render: (text, record) => (
-								<div
-									key={text + record}
-									onClick={() => setStep(1)}
-									className="cursor-pointer text-blue-500"
-								>
-									{text}
-								</div>
-							)
-						};
-					}
-
-					if (col.key === 'FULLNAME') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							filters: filter_2,
-							filterSearch: true,
-							onFilter: (value, record) => record.FULLNAME.includes(value),
-							render: (text, record) => (
-								<div
-									key={text + record}
-									onClick={() => setStep(1)}
-									className="cursor-pointer text-blue-500"
-								>
-									{text}
-								</div>
-							)
-						};
-					}
-					return {
-						...col,
-						className: 'provider-list-table-column'
-					};
-				});
-				setColumn(column);
-			})
-			.finally(() => {
-				setIsLoading(false);
-			});
 	}, []);
 	return (
 		<div className="w-full flex-1 overflow-hidden rounded bg-white shadow-lg">

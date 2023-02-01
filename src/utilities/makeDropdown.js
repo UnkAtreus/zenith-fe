@@ -6,3 +6,11 @@ export default function makeDropdown(dropdowns) {
 		};
 	});
 }
+
+export function makeFilterList(data, key) {
+	const filter = [];
+	data.forEach(item => {
+		if (item[key] != null) filter.push(item[key]);
+	});
+	return [...new Set(filter)];
+}
