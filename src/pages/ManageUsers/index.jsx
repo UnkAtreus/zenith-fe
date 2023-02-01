@@ -344,6 +344,7 @@ function ManageUsers() {
 							>
 								<Select placeholder="Select role">
 									<Select.Option value="user">User</Select.Option>
+									<Select.Option value="provider">Provider user</Select.Option>
 									<Select.Option value="admin">Admin</Select.Option>
 								</Select>
 							</Form.Item>
@@ -433,6 +434,7 @@ function ManageUsers() {
 							>
 								<Select placeholder="Select role">
 									<Select.Option value="user">User</Select.Option>
+									<Select.Option value="provider">Provider User</Select.Option>
 									<Select.Option value="admin">Admin</Select.Option>
 								</Select>
 							</Form.Item>

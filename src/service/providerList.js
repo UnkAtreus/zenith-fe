@@ -1,8 +1,10 @@
 import { axiosAuthInstance } from './axios';
 
 const ProviderList = {
-	async list(page = 1, perPage = 50) {
-		const { data } = await axiosAuthInstance.get(`provider-list?page=${page}&perPage=${perPage}`);
+	async list(page = 1, perPage = 50, provider_id = '') {
+		const { data } = await axiosAuthInstance.get(
+			`provider-list?page=${page}&perPage=${perPage}&provider_id=${provider_id}`
+		);
 
 		const $data = data.data;
 

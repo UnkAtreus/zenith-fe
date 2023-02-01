@@ -1,1 +1,1 @@
-export const role = { admin: 'admin', user: 'user', superadmin: 'superadmin' };
+export const role = { admin: 'admin', user: 'user', superadmin: 'superadmin', provider: 'provider' };

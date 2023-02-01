@@ -12,6 +12,7 @@ import RateSummaryTable from './components/RateSummaryTable';
 
 import Logo from '@/assets/images/zenith-logo.png';
 import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
+import { role } from '@/store/role';
 
 function RateSheetPopulation() {
 	const [step, setStep] = useState(0);
@@ -27,6 +28,10 @@ function RateSheetPopulation() {
 
 		if (!population) {
 			// navigate('/login');
+		}
+
+		if (Auth.role === role.provider) {
+			navigate('/');
 		}
 	}, []);
 
