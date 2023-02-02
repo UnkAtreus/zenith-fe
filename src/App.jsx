@@ -29,18 +29,21 @@ function App() {
 			if (customAttributes) {
 				const role = customAttributes.role;
 				const schema = customAttributes.schema;
+				const displayName = user.reloadUserInfo.displayName;
 
 				return {
 					user,
 					role,
-					schema
+					schema,
+					displayName
 				};
 			}
 		}
 		return {
 			user: null,
 			role: null,
-			schema: null
+			schema: null,
+			displayName: null
 		};
 	}, [user]);
 

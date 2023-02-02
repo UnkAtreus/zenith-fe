@@ -44,7 +44,6 @@ axiosAuthInstance.interceptors.request.use(
 	async config => {
 		let accessToken = localStorage.getItem('token');
 		let client = JSON.parse(JSON.parse(localStorage.getItem('client_id')));
-		console.log(client);
 
 		if (!accessToken || checkAccessTokenIsExpired(accessToken)) {
 			try {

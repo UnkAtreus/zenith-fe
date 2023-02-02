@@ -16,7 +16,10 @@ function ManageUsers() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditOpen, setIsEditOpen] = useState(false);
 
-	const [form] = Form.useForm();
+	// console.log(Form.useWatch('role', form));
+
+	const [form_edit] = Form.useForm();
+	const [form_create] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const Auth = useContext(AuthContext);
@@ -78,7 +81,7 @@ function ManageUsers() {
 				<Space>
 					<Button
 						onClick={() => {
-							form.setFieldsValue({
+							form_edit.setFieldsValue({
 								uid: record.uid,
 								displayName: record.displayName,
 								email: record.email,
@@ -113,18 +116,11 @@ function ManageUsers() {
 		console.log(values);
 		try {
 			await AdminService.postCreateUser(values);
-			messageApi.open({
-				type: 'success',
-				content: 'Created user successfully'
-			});
-
+			message.success('Created user successfully');
 			const usersData = await AdminService.getAllUser();
 			setUsers(usersData.users);
 		} catch (error) {
-			messageApi.open({
-				type: 'error',
-				content: error.response.data.message
-			});
+			message.error(error.response.data.message);
 		}
 		setIsModalOpen(false);
 	};
@@ -132,20 +128,15 @@ function ManageUsers() {
 	const onEdit = async values => {
 		try {
 			await AdminService.postUpdateUser(values);
-			messageApi.open({
-				type: 'success',
-				content: 'Updated user successfully'
-			});
 
 			const usersData = await AdminService.getAllUser();
 			setUsers(usersData.users);
+			message.success('Created user successfully');
 		} catch (error) {
-			messageApi.open({
-				type: 'error',
-				content: error.response.data.message
-			});
+			message.error(error.response.data.message);
 		}
 		setIsEditOpen(false);
+		form_edit.resetFields();
 	};
 
 	const onDel = async values => {
@@ -263,30 +254,85 @@ function ManageUsers() {
 					</section>
 					<Modal
 						title="Create user"
-						visible={isModalOpen}
+						open={isModalOpen}
 						okText="Create"
 						cancelText="Cancel"
 						onOk={() => {
-							form.validateFields().then(values => {
-								form.resetFields();
+							form_create.validateFields().then(values => {
+								form_create.resetFields();
 								onCreate(values);
 							});
 						}}
 						onCancel={handleCancel}
 					>
-						<Form form={form} layout="vertical">
+						<Form form={form_create} layout="vertical">
 							<Form.Item
-								name="displayName"
-								label="Display name"
-								rules={[
-									{
-										required: true,
-										message: 'Please input display name'
-									}
-								]}
+								name="role"
+								label="Role"
+								rules={[{ required: true, message: 'Role is required' }]}
 							>
-								<Input />
+								<Select placeholder="Select role">
+									<Select.Option value="user">User</Select.Option>
+									<Select.Option value="provider">Provider user</Select.Option>
+									<Select.Option value="admin">Admin</Select.Option>
+								</Select>
 							</Form.Item>
+
+							{Auth.role === 'superadmin' && (
+								<Form.Item
+									name="schema"
+									label="Schema"
+									initialValue={Auth.schema}
+									rules={[{ required: true, message: 'Schema is required' }]}
+								>
+									<Select placeholder="Select schema">
+										<Select.Option value="san">SAN</Select.Option>
+										<Select.Option value="cbh">CBH</Select.Option>
+									</Select>
+								</Form.Item>
+							)}
+							{Auth.role === 'admin' && (
+								<Form.Item
+									name="schema"
+									label="Schema"
+									initialValue={Auth.schema}
+									rules={[{ required: true, message: 'Schema is required' }]}
+								>
+									<Select placeholder="Select schema" disabled>
+										<Select.Option value="san">SAN</Select.Option>
+										<Select.Option value="cbh">CBH</Select.Option>
+									</Select>
+								</Form.Item>
+							)}
+							{Form.useWatch('role', form_create) === 'provider' ? (
+								<Form.Item
+									name="displayName"
+									label="Provider ID"
+									rules={[
+										{
+											required: true,
+											message: 'Please input provider ID'
+										},
+										{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
+									]}
+								>
+									<Input />
+								</Form.Item>
+							) : (
+								<Form.Item
+									name="displayName"
+									label="Display name"
+									rules={[
+										{
+											required: true,
+											message: 'Please input display name'
+										}
+									]}
+								>
+									<Input />
+								</Form.Item>
+							)}
+
 							<Form.Item
 								name="email"
 								label="Email Address"
@@ -336,61 +382,22 @@ function ManageUsers() {
 							>
 								<Input.Password />
 							</Form.Item>
-
-							<Form.Item
-								name="role"
-								label="Role"
-								rules={[{ required: true, message: 'Role is required' }]}
-							>
-								<Select placeholder="Select role">
-									<Select.Option value="user">User</Select.Option>
-									<Select.Option value="provider">Provider user</Select.Option>
-									<Select.Option value="admin">Admin</Select.Option>
-								</Select>
-							</Form.Item>
-
-							{Auth.role === 'superadmin' && (
-								<Form.Item
-									name="schema"
-									label="Schema"
-									initialValue={Auth.schema}
-									rules={[{ required: true, message: 'Schema is required' }]}
-								>
-									<Select placeholder="Select schema">
-										<Select.Option value="san">SAN</Select.Option>
-										<Select.Option value="cbh">CBH</Select.Option>
-									</Select>
-								</Form.Item>
-							)}
-							{Auth.role === 'admin' && (
-								<Form.Item
-									name="schema"
-									label="Schema"
-									initialValue={Auth.schema}
-									rules={[{ required: true, message: 'Schema is required' }]}
-								>
-									<Select placeholder="Select schema" disabled>
-										<Select.Option value="san">SAN</Select.Option>
-										<Select.Option value="cbh">CBH</Select.Option>
-									</Select>
-								</Form.Item>
-							)}
 						</Form>
 					</Modal>
 
 					<Modal
 						title="Edit user"
-						visible={isEditOpen}
+						open={isEditOpen}
 						okText="Submit"
 						cancelText="Cancel"
 						onOk={() => {
-							form.validateFields().then(values => {
+							form_edit.validateFields().then(values => {
 								onEdit(values);
 							});
 						}}
 						onCancel={() => setIsEditOpen(false)}
 					>
-						<Form form={form} layout="vertical">
+						<Form form={form_edit} layout="vertical">
 							<Form.Item
 								name="uid"
 								hidden
@@ -398,31 +405,6 @@ function ManageUsers() {
 									{
 										required: true
 									}
-								]}
-							>
-								<Input />
-							</Form.Item>
-							<Form.Item
-								name="displayName"
-								label="Display name"
-								rules={[
-									{
-										required: true,
-										message: 'Please input display name'
-									}
-								]}
-							>
-								<Input />
-							</Form.Item>
-							<Form.Item
-								name="email"
-								label="Email Address"
-								rules={[
-									{
-										required: true,
-										message: 'Please input email address'
-									},
-									{ type: 'email', message: 'Please enter a valid email address' }
 								]}
 							>
 								<Input />
@@ -462,6 +444,49 @@ function ManageUsers() {
 									</Select>
 								</Form.Item>
 							)}
+							{Form.useWatch('role', form_edit) === 'provider' ? (
+								<Form.Item
+									name="displayName"
+									label="Provider ID"
+									rules={[
+										{
+											required: true,
+											message: 'Please input provider ID'
+										},
+										{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
+									]}
+								>
+									<Input />
+								</Form.Item>
+							) : (
+								<Form.Item
+									name="displayName"
+									label="Display name"
+									rules={[
+										{
+											required: true,
+											message: 'Please input display name'
+										}
+									]}
+								>
+									<Input />
+								</Form.Item>
+							)}
+
+							<Form.Item
+								name="email"
+								label="Email Address"
+								rules={[
+									{
+										required: true,
+										message: 'Please input email address'
+									},
+									{ type: 'email', message: 'Please enter a valid email address' }
+								]}
+							>
+								<Input />
+							</Form.Item>
+
 							{/* <Form.Item
 								name="schema"
 								label="Schema"

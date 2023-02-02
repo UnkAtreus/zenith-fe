@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import { Button, PageHeader, Breadcrumb, Table, Row, Statistic, Col } from 'antd';
 import { Excel } from 'antd-table-saveas-excel';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../../../../../App';
 
 import ProviderList from '@/service/providerList';
 import { GAPS_IN_CARE, PROVID_PROV, MEM_FULL_PROV, MEASURE_PROV, MEASURE } from '@/store/table_column';
@@ -28,6 +30,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 	});
 
 	const navigate = useNavigate();
+	const Auth = useContext(AuthContext);
 
 	const haldleExport = () => {
 		const excel = new Excel();
@@ -220,13 +223,15 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 
 	async function fetchAllData() {
 		setIsLoading(true);
-		const { total, columns } = await ProviderList.list();
+		const provider_id = Auth.role === 'provider' ? Auth.displayName : '';
+
+		const { total, columns } = await ProviderList.list(1, 50, provider_id);
 		const totalPages = Math.ceil(total / 1000);
 		const texts = await Promise.all(
 			Array(totalPages)
 				.fill(0)
 				.map(async (u, i) => {
-					const { data } = await ProviderList.list(i + 1, 1000);
+					const { data } = await ProviderList.list(i + 1, 1000, provider_id);
 					return data;
 				})
 		);
