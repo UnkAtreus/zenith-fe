@@ -16,7 +16,7 @@ import Logo from '@/assets/images/zenith-logo.png';
 import firebaseApp from '@/service/firebase';
 import PopulationService from '@/service/population';
 import StatisticService from '@/service/statistic';
-import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
+import { ADMIN_MENUITEMS, MENUITEMS, menuRole } from '@/store/menu_title';
 import { role } from '@/store/role';
 
 const auth = getAuth(firebaseApp);
@@ -26,6 +26,7 @@ function Home() {
 	const Auth = useContext(AuthContext);
 
 	const isAdmin = Auth?.role?.includes('admin') || false;
+	const isProvider = Auth?.role?.includes(role.provider) || false;
 
 	const [populations, setPopulations] = useState({ populationName: '', populationList: [], dropdownPop: [] });
 	const [statistics, setStatistics] = useState({
@@ -48,6 +49,10 @@ function Home() {
 				// console.log(JSON.parse(user.reloadUserInfo.customAttributes));
 				if (!Auth && !population && !(Auth.role in role)) {
 					navigate('/login');
+				}
+
+				if (Auth && Auth.role === role.provider) {
+					navigate('/reports/rate-sheet-provider');
 				}
 				if (!isLoading) {
 					setLoading(true);
@@ -113,7 +118,7 @@ function Home() {
 							mode="horizontal"
 							defaultSelectedKeys={['dashboard']}
 							className="flex-1 justify-end"
-							items={isAdmin ? ADMIN_MENUITEMS : MENUITEMS}
+							items={menuRole(Auth?.role)}
 						/>
 					</div>
 				</div>
@@ -139,7 +144,7 @@ function Home() {
 							<h1 className="mb-0 text-xl text-white">{populations.populationName}</h1>
 							<div className="flex items-center space-x-4">
 								<Dropdown
-									overlay={
+									menu={
 										<Menu
 											onClick={e => {
 												// localStorage.setItem('population', e.key);

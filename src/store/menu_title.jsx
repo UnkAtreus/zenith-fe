@@ -1,6 +1,54 @@
 import React from 'react';
 
-import { Link } from 'react-router-dom';
+import { signOut } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { role } from './role';
+
+import firebaseApp from '@/service/firebase';
+
+const auth = getAuth(firebaseApp);
+
+export function menuRole(roles) {
+	const navigate = useNavigate();
+	console.log(roles);
+	switch (roles) {
+		case role.admin:
+			return ADMIN_MENUITEMS;
+		case role.superadmin:
+			return ADMIN_MENUITEMS;
+		case role.provider:
+			return [
+				{
+					label: [
+						<Link to="/reports/rate-sheet-provider" key="dashboard">
+							Provider List
+						</Link>
+					],
+					key: 'dashboard'
+				},
+				{
+					label: [
+						<div
+							onClick={() => {
+								localStorage.removeItem('token');
+								localStorage.removeItem('population');
+								signOut(auth);
+								navigate('/login');
+							}}
+							key="logout"
+						>
+							Logout
+						</div>
+					],
+					key: 'logout'
+				}
+			];
+		default:
+			return MENUITEMS;
+	}
+}
 
 export const MENUITEMS = [
 	{

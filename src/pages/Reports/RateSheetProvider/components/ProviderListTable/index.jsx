@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../../../../App';
 
 import ProviderList from '@/service/providerList';
+import { role } from '@/store/role';
 import { GAPS_IN_CARE, PROVID_PROV, MEM_FULL_PROV, MEASURE_PROV, MEASURE } from '@/store/table_column';
 import makeColumn from '@/utilities/makeColumn';
 import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
@@ -435,12 +436,16 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 		<div className="w-full flex-1 overflow-hidden rounded bg-white shadow-lg">
 			<PageHeader
 				title="Provider List"
-				onBack={() => navigate(`/`)}
+				onBack={() => {
+					if (Auth.role === role.provider) {
+						navigate('/reports/rate-sheet-provider');
+					} else {
+						navigate('/');
+					}
+				}}
 				breadcrumb={
 					<Breadcrumb>
-						<Breadcrumb.Item>
-							<a href="/">Dashboard</a>
-						</Breadcrumb.Item>
+						<Breadcrumb.Item>Dashboard</Breadcrumb.Item>
 						<Breadcrumb.Item>Provider List</Breadcrumb.Item>
 					</Breadcrumb>
 				}

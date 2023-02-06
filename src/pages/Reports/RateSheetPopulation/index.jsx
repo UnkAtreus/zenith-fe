@@ -11,7 +11,7 @@ import MemberListTable from './components/MemberListTable';
 import RateSummaryTable from './components/RateSummaryTable';
 
 import Logo from '@/assets/images/zenith-logo.png';
-import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
+import { ADMIN_MENUITEMS, MENUITEMS, menuRole } from '@/store/menu_title';
 import { role } from '@/store/role';
 
 function RateSheetPopulation() {
@@ -51,7 +51,7 @@ function RateSheetPopulation() {
 							mode="horizontal"
 							defaultSelectedKeys={['dashboard']}
 							className="flex-1 justify-end"
-							items={Auth?.role?.includes('admin') ? ADMIN_MENUITEMS : MENUITEMS}
+							items={menuRole(Auth?.role)}
 						/>
 					</div>
 				</div>

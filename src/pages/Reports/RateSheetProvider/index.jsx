@@ -9,7 +9,8 @@ import ProviderListTable from './components/ProviderListTable';
 import ProviderMemberListTable from './components/ProviderMemberListTable';
 
 import Logo from '@/assets/images/zenith-logo.png';
-import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
+import { ADMIN_MENUITEMS, MENUITEMS, menuRole } from '@/store/menu_title';
+import { role } from '@/store/role';
 
 function RateSheetProvider() {
 	const [step, setStep] = useState(0);
@@ -31,7 +32,16 @@ function RateSheetProvider() {
 		<Layout>
 			<Layout.Header className="fixed z-10 flex w-full items-center bg-white shadow">
 				<div className="flex flex-1 items-center justify-between">
-					<div className="flex cursor-pointer items-center space-x-4" onClick={() => navigate('/')}>
+					<div
+						className="flex cursor-pointer items-center space-x-4"
+						onClick={() => {
+							if (Auth.role === role.provider) {
+								navigate('/reports/rate-sheet-provider');
+							} else {
+								navigate('/');
+							}
+						}}
+					>
 						<div className="relative flex h-14 w-14">
 							<img src={Logo} alt="" />
 						</div>
@@ -43,7 +53,7 @@ function RateSheetProvider() {
 							mode="horizontal"
 							defaultSelectedKeys={['dashboard']}
 							className="flex-1 justify-end"
-							items={Auth?.role?.includes('admin') ? ADMIN_MENUITEMS : MENUITEMS}
+							items={menuRole(Auth?.role)}
 						/>
 					</div>
 				</div>

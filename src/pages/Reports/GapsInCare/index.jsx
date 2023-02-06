@@ -8,7 +8,7 @@ import { AuthContext } from '../../../App';
 import GapsInCareTable from './components/GapsInCareTable';
 
 import Logo from '@/assets/images/zenith-logo.png';
-import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
+import { ADMIN_MENUITEMS, MENUITEMS, menuRole } from '@/store/menu_title';
 import { role } from '@/store/role';
 
 function GapsInCare() {
@@ -45,7 +45,7 @@ function GapsInCare() {
 							mode="horizontal"
 							defaultSelectedKeys={['dashboard']}
 							className="flex-1 justify-end"
-							items={Auth?.role?.includes('admin') ? ADMIN_MENUITEMS : MENUITEMS}
+							items={menuRole(Auth?.role)}
 						/>
 					</div>
 				</div>
