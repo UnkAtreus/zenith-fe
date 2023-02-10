@@ -24,12 +24,6 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 		perPage: 50
 	});
 
-	const [filter, setFilter] = useState({
-		PROVIDER_ID: [],
-		FULLNAME: [],
-		HEDIS_MEASURE: []
-	});
-
 	const navigate = useNavigate();
 	const Auth = useContext(AuthContext);
 
@@ -243,11 +237,6 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				data.push(item);
 			});
 		});
-		setFilter({
-			PROVIDER_ID: makeDropdown(makeFilterList(data, 'PROVIDER_ID')),
-			FULLNAME: makeDropdown(makeFilterList(data, 'FULLNAME')),
-			HEDIS_MEASURE: makeDropdown(makeFilterList(data, 'HEDIS_MEASURE'))
-		});
 		setData(data);
 		setFilterData(data);
 		setPagination({
@@ -402,6 +391,16 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 							{text}
 						</div>
 					)
+				};
+			}
+
+			if (col.key === 'NPI') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					filters: makeDropdown(makeFilterList(data, 'NPI')),
+					filterSearch: true,
+					onFilter: (value, record) => record.NPI.includes(value)
 				};
 			}
 
