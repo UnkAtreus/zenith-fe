@@ -45,6 +45,33 @@ export function menuRole(roles) {
 					key: 'logout'
 				}
 			];
+		case role.clinic:
+			return [
+				{
+					label: [
+						<Link to="/reports/rate-sheet-provider" key="dashboard">
+							Provider List
+						</Link>
+					],
+					key: 'dashboard'
+				},
+				{
+					label: [
+						<div
+							onClick={() => {
+								localStorage.removeItem('token');
+								localStorage.removeItem('population');
+								signOut(auth);
+								navigate('/login');
+							}}
+							key="logout"
+						>
+							Logout
+						</div>
+					],
+					key: 'logout'
+				}
+			];
 		default:
 			return MENUITEMS;
 	}

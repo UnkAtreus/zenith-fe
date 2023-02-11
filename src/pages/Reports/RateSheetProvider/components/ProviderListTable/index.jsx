@@ -218,15 +218,16 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 
 	async function fetchAllData() {
 		setIsLoading(true);
-		const provider_id = Auth.role === 'provider' ? Auth.displayName : '';
+		const provider_id = Auth.role === role.provider ? Auth.displayName : '';
+		const npi = Auth.role === role.clinic ? Auth.displayName : '';
 
-		const { total, columns } = await ProviderList.list(1, 50, provider_id);
+		const { total, columns } = await ProviderList.list(1, 50, provider_id, npi);
 		const totalPages = Math.ceil(total / 1000);
 		const texts = await Promise.all(
 			Array(totalPages)
 				.fill(0)
 				.map(async (u, i) => {
-					const { data } = await ProviderList.list(i + 1, 1000, provider_id);
+					const { data } = await ProviderList.list(i + 1, 1000, provider_id, npi);
 					return data;
 				})
 		);

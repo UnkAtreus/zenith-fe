@@ -9,6 +9,7 @@ import { AuthContext } from '../../App';
 import Logo from '@/assets/images/zenith-logo.png';
 import AdminService from '@/service/admin';
 import { ADMIN_MENUITEMS } from '@/store/menu_title';
+import { role } from '@/store/role';
 
 function ManageUsers() {
 	const [users, setUsers] = useState([]);
@@ -53,13 +54,33 @@ function ManageUsers() {
 			title: 'Role',
 			dataIndex: 'role',
 			key: 'role',
-			render: (_, record) => <div>{record.customClaims.role}</div>
+			render: (_, record) => <div>{record.customClaims.role}</div>,
+			onFilter: (value, record) => {
+				if (Auth.role === role.superadmin) {
+					return true;
+				}
+				if (Auth.role === role.admin && record.customClaims.role !== role.superadmin) {
+					return true;
+				}
+				return false;
+			},
+			defaultFilteredValue: ['']
 		},
 		{
 			title: 'Schema',
 			dataIndex: 'schema',
 			key: 'schema',
-			render: (_, record) => <div>{record.customClaims.schema}</div>
+			render: (_, record) => <div>{record.customClaims.schema}</div>,
+			onFilter: (value, record) => {
+				if (Auth.role === role.superadmin) {
+					return true;
+				}
+				if (record.customClaims.schema === Auth.schema) {
+					return true;
+				}
+				return false;
+			},
+			defaultFilteredValue: ['']
 		},
 		{
 			title: 'Created',
@@ -107,6 +128,59 @@ function ManageUsers() {
 			)
 		}
 	];
+
+	const roleInputForm = watchRole => {
+		switch (watchRole) {
+			case role.provider:
+				return (
+					<Form.Item
+						name="displayName"
+						label="Provider ID"
+						rules={[
+							{
+								required: true,
+								message: 'Please input provider ID'
+							},
+							{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
+						]}
+					>
+						<Input />
+					</Form.Item>
+				);
+			case role.clinic:
+				return (
+					<Form.Item
+						name="displayName"
+						label="NPI"
+						rules={[
+							{
+								required: true,
+								message: 'Please input NPI'
+							},
+							{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
+						]}
+					>
+						<Input />
+					</Form.Item>
+				);
+
+			default:
+				return (
+					<Form.Item
+						name="displayName"
+						label="Display name"
+						rules={[
+							{
+								required: true,
+								message: 'Please input display name'
+							}
+						]}
+					>
+						<Input />
+					</Form.Item>
+				);
+		}
+	};
 
 	const showModal = () => {
 		setIsModalOpen(true);
@@ -274,6 +348,7 @@ function ManageUsers() {
 								<Select placeholder="Select role">
 									<Select.Option value="user">User</Select.Option>
 									<Select.Option value="provider">Provider user</Select.Option>
+									<Select.Option value="clinic">Clinic user</Select.Option>
 									<Select.Option value="admin">Admin</Select.Option>
 								</Select>
 							</Form.Item>
@@ -304,34 +379,7 @@ function ManageUsers() {
 									</Select>
 								</Form.Item>
 							)}
-							{Form.useWatch('role', form_create) === 'provider' ? (
-								<Form.Item
-									name="displayName"
-									label="Provider ID"
-									rules={[
-										{
-											required: true,
-											message: 'Please input provider ID'
-										},
-										{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
-									]}
-								>
-									<Input />
-								</Form.Item>
-							) : (
-								<Form.Item
-									name="displayName"
-									label="Display name"
-									rules={[
-										{
-											required: true,
-											message: 'Please input display name'
-										}
-									]}
-								>
-									<Input />
-								</Form.Item>
-							)}
+							{roleInputForm(Form.useWatch('role', form_create))}
 
 							<Form.Item
 								name="email"
@@ -417,6 +465,7 @@ function ManageUsers() {
 								<Select placeholder="Select role">
 									<Select.Option value="user">User</Select.Option>
 									<Select.Option value="provider">Provider User</Select.Option>
+									<Select.Option value="clinic">Clinic User</Select.Option>
 									<Select.Option value="admin">Admin</Select.Option>
 								</Select>
 							</Form.Item>
@@ -444,35 +493,7 @@ function ManageUsers() {
 									</Select>
 								</Form.Item>
 							)}
-							{Form.useWatch('role', form_edit) === 'provider' ? (
-								<Form.Item
-									name="displayName"
-									label="Provider ID"
-									rules={[
-										{
-											required: true,
-											message: 'Please input provider ID'
-										},
-										{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
-									]}
-								>
-									<Input />
-								</Form.Item>
-							) : (
-								<Form.Item
-									name="displayName"
-									label="Display name"
-									rules={[
-										{
-											required: true,
-											message: 'Please input display name'
-										}
-									]}
-								>
-									<Input />
-								</Form.Item>
-							)}
-
+							{roleInputForm(Form.useWatch('role', form_edit))}
 							<Form.Item
 								name="email"
 								label="Email Address"
@@ -486,7 +507,6 @@ function ManageUsers() {
 							>
 								<Input />
 							</Form.Item>
-
 							{/* <Form.Item
 								name="schema"
 								label="Schema"
