@@ -102,6 +102,61 @@ function Home() {
 	// 		</div>
 	// 	);
 	// }
+
+	const renderNavigationItem = () => {
+		switch (Auth.role) {
+			case role.provider:
+				return (
+					<div className="space-y-4">
+						<div
+							onClick={() => navigate('/reports/rate-sheet-provider')}
+							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+						>
+							Rate Sheet by Provider
+						</div>
+					</div>
+				);
+			case role.clinic:
+				return (
+					<div className="space-y-4">
+						<div
+							onClick={() => navigate('/reports/rate-sheet-provider')}
+							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+						>
+							Rate Sheet by Provider
+						</div>
+					</div>
+				);
+
+			default:
+				return (
+					<div className="space-y-4">
+						<div
+							onClick={() => navigate('/reports/rate-sheet-population')}
+							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+						>
+							Rate Sheet by Measure (Population)
+						</div>
+
+						<div
+							onClick={() => navigate('/reports/rate-sheet-provider')}
+							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+						>
+							Rate Sheet by Provider
+						</div>
+
+						{Auth.schema !== 'cbh' && (
+							<div
+								onClick={() => navigate('/reports/gaps-in-care')}
+								className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+							>
+								Gaps in Care
+							</div>
+						)}
+					</div>
+				);
+		}
+	};
 	return (
 		<Layout>
 			<Layout.Header className="fixed z-10 flex w-full items-center bg-white shadow">
@@ -271,34 +326,7 @@ function Home() {
 								<div className="h-fit w-full rounded-2xl bg-white px-6 py-10 shadow-lg">
 									<div className="text-xl font-medium">Navigational Items</div>
 									<div className="mb-4 text-xs font-medium">{populations.populationName}</div>
-									<div className="space-y-4">
-										{Auth.role !== role.provider ||
-											(Auth.role !== role.clinic && (
-												<div
-													onClick={() => navigate('/reports/rate-sheet-population')}
-													className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
-												>
-													Rate Sheet by Measure (Population)
-												</div>
-											))}
-
-										<div
-											onClick={() => navigate('/reports/rate-sheet-provider')}
-											className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
-										>
-											Rate Sheet by Provider
-										</div>
-
-										{Auth.role !== role.provider ||
-											(Auth.role !== role.clinic && Auth.schema !== 'cbh' && (
-												<div
-													onClick={() => navigate('/reports/gaps-in-care')}
-													className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
-												>
-													Gaps in Care
-												</div>
-											))}
-									</div>
+									{renderNavigationItem()}
 								</div>
 							</Col>
 						</Row>
