@@ -3,9 +3,11 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Column, Progress, Line } from '@ant-design/charts';
 import { LoadingOutlined, TeamOutlined } from '@ant-design/icons';
 import { Layout, Menu, Row, Col, Statistic, Divider, Select, Spin, Cascader } from 'antd';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../../App';
+import { PROJECTLIST } from '../Home';
 
 import Logo from '@/assets/images/zenith-logo.png';
 import StatisticService from '@/service/statistic';
@@ -216,47 +218,32 @@ function GoalTracker() {
 								<div className="h-full w-full rounded-2xl bg-white px-6 py-10 shadow-lg">
 									<div className="mb-4 text-xl font-medium">Recent Update</div>
 									<div className=" space-y-2 overflow-auto">
-										<div
-											onClick={() => {
-												localStorage.setItem('database', 'schema1');
-												window.location.reload();
-											}}
-											className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
-												localStorage.getItem('database') === 'schema1' &&
-												'bg-slate-100 hover:bg-slate-100'
-											}`}
-										>
-											<TeamOutlined style={{ fontSize: `32px` }} />
+										{PROJECTLIST.map(data => (
+											<>
+												<div
+													onClick={() => {
+														localStorage.setItem('database', data.database);
+														window.location.reload();
+													}}
+													className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
+														localStorage.getItem('database') === data.database &&
+														'bg-slate-100 hover:bg-slate-100'
+													}`}
+												>
+													<TeamOutlined style={{ fontSize: `32px` }} />
 
-											<div className="overflow-hidden">
-												<div className="overflow-hidden text-ellipsis whitespace-nowrap">
-													ZENITHRUN - OCT2022
+													<div className="overflow-hidden">
+														<div className="overflow-hidden text-ellipsis whitespace-nowrap">
+															{data.title}
+														</div>
+														<div className="text-gray-400">
+															Last updated: {dayjs(data.date).format('MM/DD/YYYY')}
+														</div>
+													</div>
 												</div>
-												<div className="text-gray-400">Last updated: 09/30/2022</div>
-											</div>
-										</div>
-										<Divider />
-										<div
-											onClick={() => {
-												localStorage.setItem('database', 'schema2');
-												window.location.reload();
-											}}
-											className={`${
-												localStorage.getItem('database') === 'schema2' &&
-												'bg-slate-100 hover:bg-slate-100'
-											} flex cursor-pointer items-center
-											space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50`}
-										>
-											<TeamOutlined style={{ fontSize: `32px` }} />
-
-											<div className="overflow-hidden">
-												<div className="overflow-hidden text-ellipsis whitespace-nowrap">
-													ZENITHRUN - SEP2022
-												</div>
-												<div className="text-gray-400">Last updated: 08/30/2022</div>
-											</div>
-										</div>
-										<Divider />
+												<Divider />
+											</>
+										))}
 									</div>
 								</div>
 							</Col>

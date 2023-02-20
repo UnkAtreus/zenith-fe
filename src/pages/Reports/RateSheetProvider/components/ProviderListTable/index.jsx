@@ -364,6 +364,13 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					)
 				};
 			}
+
+			if (col.key === 'PROVIDER_ID') {
+				return {
+					...col,
+					className: 'hidden'
+				};
+			}
 			if (col.key === 'TO_REACH_GOAL') {
 				return {
 					...col,
@@ -380,26 +387,21 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				};
 			}
 
-			if (col.key === 'PROVIDER_ID') {
-				return {
-					...col,
-					className: 'provider-list-table-column',
-					filters: makeDropdown(makeFilterList(data, 'PROVIDER_ID')),
-					filterSearch: true,
-					onFilter: (value, record) => record.PROVIDER_ID.includes(value),
-					render: (text, record) => (
-						<div key={text + record} onClick={() => setStep(1)} className="cursor-pointer text-blue-500">
-							{text}
-						</div>
-					)
-				};
-			}
-
 			if (col.key === 'NPI') {
 				return {
 					...col,
 					className: 'provider-list-table-column',
 					filters: makeDropdown(makeFilterList(data, 'NPI')),
+					filterSearch: true,
+					onFilter: (value, record) => record.NPI.includes(value)
+				};
+			}
+
+			if (col.key === 'TIN') {
+				return {
+					...col,
+					className: 'provider-list-table-column',
+					filters: makeDropdown(makeFilterList(data, 'TIN')),
 					filterSearch: true,
 					onFilter: (value, record) => record.NPI.includes(value)
 				};

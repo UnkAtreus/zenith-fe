@@ -21,6 +21,24 @@ import { role } from '@/store/role';
 
 const auth = getAuth(firebaseApp);
 
+export const PROJECTLIST = [
+	{
+		title: 'ZENITHRUN - JAN2023 ',
+		date: '01-31-2022',
+		database: 'schema1'
+	},
+	{
+		title: 'ZENITHRUN - DEC2022 ',
+		date: '12-31-2022',
+		database: 'schema2'
+	},
+	{
+		title: 'ZENITHRUN - OCT2022 ',
+		date: '09-30-2022',
+		database: 'schema3'
+	}
+];
+
 function Home() {
 	// const [user, _loading] = useAuthState(auth);
 	const Auth = useContext(AuthContext);
@@ -274,50 +292,36 @@ function Home() {
 							</Col>
 
 							<Col span={12}>
-								<div className="h-full w-full rounded-2xl bg-white px-6 py-10 shadow-lg">
+								<div className="h-full max-h-96 w-full rounded-2xl bg-white px-6 py-10 shadow-lg">
 									<div className="mb-4 text-xl font-medium">Project List</div>
-									<div className="h-full space-y-2 overflow-auto">
+									<div className="  max-h-56 space-y-2 overflow-auto">
 										<div key={`project-card`}>
-											<div
-												onClick={() => {
-													localStorage.setItem('database', 'schema1');
-													window.location.reload();
-												}}
-												className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
-													localStorage.getItem('database') === 'schema1' &&
-													'bg-slate-100 hover:bg-slate-100'
-												}`}
-											>
-												<TeamOutlined style={{ fontSize: `32px` }} />
+											{PROJECTLIST.map((data, i) => (
+												<>
+													<div
+														onClick={() => {
+															localStorage.setItem('database', data.database);
+															window.location.reload();
+														}}
+														className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
+															localStorage.getItem('database') === data.database &&
+															'bg-slate-100 hover:bg-slate-100'
+														}`}
+													>
+														<TeamOutlined style={{ fontSize: `32px` }} />
 
-												<div className="overflow-hidden">
-													<div className="overflow-hidden text-ellipsis whitespace-nowrap">
-														ZENITHRUN - OCT2022
+														<div className="overflow-hidden">
+															<div className="overflow-hidden text-ellipsis whitespace-nowrap">
+																{data.title}
+															</div>
+															<div className="text-gray-400">
+																Last updated: {dayjs(data.date).format('MM/DD/YYYY')}
+															</div>
+														</div>
 													</div>
-													<div className="text-gray-400">Last updated: 09/30/2022</div>
-												</div>
-											</div>
-											<Divider className="my-4" />
-											<div
-												onClick={() => {
-													localStorage.setItem('database', 'schema2');
-													window.location.reload();
-												}}
-												className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
-													localStorage.getItem('database') === 'schema2' &&
-													'bg-slate-100 hover:bg-slate-100'
-												}`}
-											>
-												<TeamOutlined style={{ fontSize: `32px` }} />
-
-												<div className="overflow-hidden">
-													<div className="overflow-hidden text-ellipsis whitespace-nowrap">
-														ZENITHRUN - SEP2022
-													</div>
-													<div className="text-gray-400">Last updated: 08/30/2022</div>
-												</div>
-											</div>
-											<Divider className="my-4" />
+													<Divider className="my-4" />
+												</>
+											))}
 										</div>
 									</div>
 								</div>
