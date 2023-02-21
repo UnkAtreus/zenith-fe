@@ -1,7 +1,21 @@
 import React, { useEffect, useContext, useState } from 'react';
 
-import { ExclamationCircleFilled } from '@ant-design/icons';
-import { Layout, Menu, Table, PageHeader, Breadcrumb, Button, Space, Modal, Form, Input, Select, message } from 'antd';
+import { ExclamationCircleFilled, MoreOutlined } from '@ant-design/icons';
+import {
+	Layout,
+	Menu,
+	Table,
+	PageHeader,
+	Breadcrumb,
+	Button,
+	Space,
+	Modal,
+	Form,
+	Input,
+	Select,
+	message,
+	Dropdown
+} from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../../App';
@@ -16,11 +30,13 @@ function ManageUsers() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [isEditOpen, setIsEditOpen] = useState(false);
+	const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
 	// console.log(Form.useWatch('role', form));
 
 	const [form_edit] = Form.useForm();
 	const [form_create] = Form.useForm();
+	const [form_password] = Form.useForm();
 	const [messageApi, contextHolder] = message.useMessage();
 
 	const Auth = useContext(AuthContext);
@@ -99,32 +115,50 @@ function ManageUsers() {
 			dataIndex: 'action',
 			key: 'action',
 			render: (_, record) => (
-				<Space>
-					<Button
-						onClick={() => {
-							form_edit.setFieldsValue({
-								uid: record.uid,
-								displayName: record.displayName,
-								email: record.email,
-								role: record.customClaims.role,
-								schema: record.customClaims.schema
-							});
-							setIsEditOpen(true);
-						}}
-					>
-						Edit
-					</Button>
-
-					<Button
-						onClick={() => {
-							showPropsConfirm(record.uid, record.displayName);
-						}}
-						danger
-						disabled={record.uid === Auth.user.uid}
-					>
-						Delete
-					</Button>
-				</Space>
+				<Dropdown
+					key={record.uid}
+					overlay={
+						<Menu>
+							<Menu.Item>
+								<div
+									onClick={() => {
+										form_edit.setFieldsValue({
+											uid: record.uid,
+											displayName: record.displayName,
+											email: record.email,
+											role: record.customClaims.role,
+											schema: record.customClaims.schema
+										});
+										setIsEditOpen(true);
+									}}
+								>
+									Edit
+								</div>
+							</Menu.Item>
+							<Menu.Item>
+								<div
+									onClick={() => {
+										form_password.setFieldValue('uid', record.uid);
+										setIsChangePasswordOpen(true);
+									}}
+								>
+									Change password
+								</div>
+							</Menu.Item>
+							<Menu.Item danger disabled={record.uid === Auth.user.uid}>
+								<div
+									onClick={() => {
+										showPropsConfirm(record.uid, record.displayName);
+									}}
+								>
+									Delete
+								</div>
+							</Menu.Item>
+						</Menu>
+					}
+				>
+					<MoreOutlined className="cursor-pointer" />
+				</Dropdown>
 			)
 		}
 	];
@@ -135,11 +169,11 @@ function ManageUsers() {
 				return (
 					<Form.Item
 						name="displayName"
-						label="Provider ID"
+						label="NPI"
 						rules={[
 							{
 								required: true,
-								message: 'Please input provider ID'
+								message: 'Please input NPI'
 							},
 							{ pattern: '^[0-9]{1,10}$', message: 'Please input number less than 10 digit.' }
 						]}
@@ -211,6 +245,20 @@ function ManageUsers() {
 		}
 		setIsEditOpen(false);
 		form_edit.resetFields();
+	};
+
+	const onChangePassword = async values => {
+		try {
+			await AdminService.postChangeUserPassword(values);
+
+			const usersData = await AdminService.getAllUser();
+			setUsers(usersData.users);
+			message.success('Change user password successfully');
+		} catch (error) {
+			message.error(error.response.data.message);
+		}
+		setIsChangePasswordOpen(false);
+		form_password.resetFields();
 	};
 
 	const onDel = async values => {
@@ -517,6 +565,68 @@ function ManageUsers() {
 									<Select.Option value="cbh">CBH</Select.Option>
 								</Select>
 							</Form.Item> */}
+						</Form>
+					</Modal>
+					<Modal
+						title="Change user password"
+						open={isChangePasswordOpen}
+						okText="Change password"
+						cancelText="Cancel"
+						onOk={() => {
+							form_password.validateFields().then(values => {
+								onChangePassword(values);
+							});
+						}}
+						onCancel={() => setIsChangePasswordOpen(false)}
+					>
+						<Form form={form_password} layout="vertical">
+							<Form.Item
+								name="uid"
+								hidden
+								rules={[
+									{
+										required: true
+									}
+								]}
+							>
+								<Input />
+							</Form.Item>
+							<Form.Item
+								name="password"
+								label="Password"
+								rules={[
+									{
+										required: true,
+										message: 'Please input your password!'
+									}
+								]}
+							>
+								<Input.Password />
+							</Form.Item>
+
+							<Form.Item
+								name="confirm"
+								label="Confirm Password"
+								dependencies={['password']}
+								rules={[
+									{
+										required: true,
+										message: 'Please confirm your password!'
+									},
+									({ getFieldValue }) => ({
+										validator(_, value) {
+											if (!value || getFieldValue('password') === value) {
+												return Promise.resolve();
+											}
+											return Promise.reject(
+												new Error('The two passwords that you entered do not match!')
+											);
+										}
+									})
+								]}
+							>
+								<Input.Password />
+							</Form.Item>
 						</Form>
 					</Modal>
 				</div>

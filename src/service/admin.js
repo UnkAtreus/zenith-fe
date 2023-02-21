@@ -20,6 +20,12 @@ const AdminService = {
 
 		return $data;
 	},
+	async postChangeUserPassword(payload) {
+		const { data } = await axiosInstance.post('/change-password-user', payload);
+		const $data = data;
+
+		return $data;
+	},
 	async postDelUser(payload) {
 		const { data } = await axiosInstance.post('/del-user', payload);
 		const $data = data;

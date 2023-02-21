@@ -26,7 +26,6 @@ export const FCTMEASOUT = [
 
 export const GAPS_IN_CARE = [
 	'TIN',
-	'PROVIDER_ID',
 	'PROV_LAST_NAME',
 	'PROV_FIRST_NAME',
 	'NPI',

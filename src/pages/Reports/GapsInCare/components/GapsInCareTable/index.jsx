@@ -143,8 +143,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							filters: filter2,
 							filterSearch: true,
 							onFilter: (value, record) => {
-								if (record.PROV_FULLNAME !== null)
-									return record.PROV_FULLNAME.includes(value);
+								if (record.PROV_FULLNAME !== null) return record.PROV_FULLNAME.includes(value);
 							},
 							render: (text, record) => (
 								<div
@@ -190,8 +189,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 							filterMode: 'tree',
 							filterSearch: true,
 							onFilter: (value, record) => {
-								if (record.PROVSPEC !== null)
-									return record.PROVSPEC.toString().includes(value);
+								if (record.PROVSPEC !== null) return record.PROVSPEC.toString().includes(value);
 							},
 							render: (text, record) => (
 								<div
@@ -210,23 +208,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 					if (col.key === 'PROVIDER_ID') {
 						return {
 							...col,
-							className: 'gaps-in-care-table-column',
-							// render: (text, record) => <div>1234</div>
-							filters: filter1,
-							filterSearch: true,
-							onFilter: (value, record) => {
-								if (record.PROVIDER_ID !== null)
-									return record.PROVIDER_ID.includes(value);
-							},
-							render: (text, record) => (
-								<div
-									key={text + record}
-									onClick={() => setStep(1)}
-									className="cursor-pointer text-blue-500"
-								>
-									{text}
-								</div>
-							)
+							className: 'hidden'
 						};
 					}
 

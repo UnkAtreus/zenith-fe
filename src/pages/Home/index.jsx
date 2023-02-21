@@ -297,7 +297,7 @@ function Home() {
 									<div className="  max-h-56 space-y-2 overflow-auto">
 										<div key={`project-card`}>
 											{PROJECTLIST.map((data, i) => (
-												<>
+												<div key={data.title}>
 													<div
 														onClick={() => {
 															localStorage.setItem('database', data.database);
@@ -320,7 +320,7 @@ function Home() {
 														</div>
 													</div>
 													<Divider className="my-4" />
-												</>
+												</div>
 											))}
 										</div>
 									</div>
