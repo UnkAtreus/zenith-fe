@@ -212,7 +212,6 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 
 	async function fetchAllData() {
 		setIsLoading(true);
-		const provider_id = Auth.role === role.provider ? Auth.displayName : '';
 		const npi = Auth.role === role.clinic || Auth.role === role.provider ? Auth.displayName : '';
 
 		const { total, columns } = await ProviderList.list(1, 50, npi);
