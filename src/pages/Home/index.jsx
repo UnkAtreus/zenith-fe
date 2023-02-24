@@ -36,6 +36,11 @@ export const PROJECTLIST = [
 		title: 'ZENITHRUN - OCT2022 ',
 		date: '09-30-2022',
 		database: 'schema3'
+	},
+	{
+		title: 'ZENITHRUN - FEB2022 ',
+		date: '01-31-2022',
+		database: 'schema4'
 	}
 ];
 
