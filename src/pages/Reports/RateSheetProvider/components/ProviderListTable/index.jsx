@@ -396,7 +396,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					className: 'provider-list-table-column',
 					filters: makeDropdown(makeFilterList(data, 'TIN')),
 					filterSearch: true,
-					onFilter: (value, record) => record.NPI.includes(value)
+					onFilter: (value, record) => record.TIN.includes(value)
 				};
 			}
 
