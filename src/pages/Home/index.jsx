@@ -89,12 +89,12 @@ function Home() {
 					setStatistics(
 						ststic.data === null
 							? {
-									total_population: 0,
-									male_population: 0,
-									female_population: 0,
-									spacial_population: 0,
-									number_measure: 0
-							  }
+								total_population: 0,
+								male_population: 0,
+								female_population: 0,
+								spacial_population: 0,
+								number_measure: 0
+							}
 							: ststic.data
 					);
 					setPopulations({
@@ -166,6 +166,13 @@ function Home() {
 							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
 						>
 							Rate Sheet by Provider
+						</div>
+
+						<div
+							onClick={() => navigate('/reports/rate-sheet-provider-comparison')}
+							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
+						>
+							Rate Sheet by Provider Comparison
 						</div>
 
 						{Auth.schema !== 'cbh' && (
@@ -308,10 +315,9 @@ function Home() {
 															localStorage.setItem('database', data.database);
 															window.location.reload();
 														}}
-														className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${
-															localStorage.getItem('database') === data.database &&
+														className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${localStorage.getItem('database') === data.database &&
 															'bg-slate-100 hover:bg-slate-100'
-														}`}
+															}`}
 													>
 														<TeamOutlined style={{ fontSize: `32px` }} />
 

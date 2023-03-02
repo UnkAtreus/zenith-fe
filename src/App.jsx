@@ -16,6 +16,8 @@ import { role } from './store/role';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import RateSheetPopulation from '@/pages/Reports/RateSheetPopulation';
+import RateSheetProviderComparison from '@/pages/Reports/RateSheetProviderComparison';
+
 
 const auth = getAuth(firebaseApp);
 export const AuthContext = createContext(null);
@@ -90,6 +92,14 @@ function App() {
 						element={
 							<ProtectedRoute>
 								<RateSheetProvider />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path="/reports/rate-sheet-provider-comparison"
+						element={
+							<ProtectedRoute>
+								<RateSheetProviderComparison />
 							</ProtectedRoute>
 						}
 					/>
