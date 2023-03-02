@@ -1,47 +1,244 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Layout, Menu } from 'antd';
+import { Column, Progress, Line, Gauge } from '@ant-design/charts';
+import { LoadingOutlined, TeamOutlined } from '@ant-design/icons';
+import { Layout, Menu, Row, Col, Statistic, Divider, Select, Spin, Cascader } from 'antd';
+import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../../../App';
-
-import ProviderListTable from './components/ProviderListTable';
-import ProviderMemberListTable from './components/ProviderMemberListTable';
+import { PROJECTLIST } from '../../Home';
 
 import Logo from '@/assets/images/zenith-logo.png';
-import { ADMIN_MENUITEMS, MENUITEMS, menuRole } from '@/store/menu_title';
-import { role } from '@/store/role';
+import StatisticService from '@/service/statistic';
+import { ADMIN_MENUITEMS, MENUITEMS } from '@/store/menu_title';
 
-function RateSheetProvider() {
-	const [step, setStep] = useState(0);
-	const [providerListRecord, setProviderListRecord] = useState({});
-	const [providerMemberListRecord, setProviderMemberListRecord] = useState({});
-	const [isLoading, setIsLoading] = useState(false);
-
+function GoalTracker() {
+	const [statistics, setStatistics] = useState({
+		total_population: 0,
+		male_population: 0,
+		female_population: 0,
+		spacial_population: 0,
+		number_measure: 0,
+		rate_bar_chart: [
+			{
+				HEDIS_MEASURE: '',
+				SUB_MEASURE: '',
+				CURRENT_YEAR_RATE: 0
+			}
+		]
+	});
+	const [loading, setLoading] = useState(false);
+	const [selectMeasure, setSelectMeasure] = useState([]);
+	const [selectListMeasure, setSelectListMeasure] = useState([]);
+	const [selectListMeasure2, setSelectListMeasure2] = useState([]);
+	const [selectOptions, setSelectOptions] = useState([]);
 	const navigate = useNavigate();
 	const Auth = useContext(AuthContext);
 
-	useEffect(() => {
-		const population = localStorage.getItem('population');
+	const filter = (inputValue, path) =>
+		path.some(option => option.label.toLowerCase().indexOf(inputValue.toLowerCase()) > -1);
 
-		if (!population) {
-			// navigate('/login');
-		}
+	useEffect(() => {
+		let isLoading = false;
+		const popId = JSON.parse(localStorage.getItem('population')).DBLREP_MASTER_POP_ID;
+		(async () => {
+			try {
+				if (!isLoading) {
+					setLoading(true);
+					const ststic = await StatisticService.getStatic(popId);
+					if (ststic.data !== null) {
+						setStatistics(ststic.data);
+						setSelectMeasure([
+							ststic.data.rate_bar_chart[0].HEDIS_MEASURE,
+							ststic.data.rate_bar_chart[0].SUB_MEASURE
+						]);
+						const options = [];
+						ststic.data.rate_bar_chart.map(data => {
+							if (
+								options.find(o => {
+									if (o.value === data.HEDIS_MEASURE) return true;
+								})
+							) {
+								const index = options.findIndex((o, i) => {
+									if (o.value === data.HEDIS_MEASURE) return true;
+								});
+								options[index].children.push({
+									value: data.SUB_MEASURE,
+									label: data.SUB_MEASURE
+								});
+							} else {
+								options.push({
+									value: data.HEDIS_MEASURE,
+									label: data.HEDIS_MEASURE,
+									children: [
+										{
+											value: data.SUB_MEASURE,
+											label: data.SUB_MEASURE
+										}
+									]
+								});
+							}
+						});
+						setSelectOptions(options);
+
+						setSelectListMeasure([
+							{
+								CURRENT_YEAR_RATE: 0,
+								HEDIS_MEASURE: '10-2022'
+							},
+							{
+								CURRENT_YEAR_RATE: ststic.data.rate_bar_chart[0].CURRENT_YEAR_RATE,
+								HEDIS_MEASURE: '11-2022'
+							},
+							{
+								CURRENT_YEAR_RATE: 25,
+								HEDIS_MEASURE: '12-2022'
+							},
+							{
+								CURRENT_YEAR_RATE: 50,
+								HEDIS_MEASURE: '1-2023'
+							},
+							{
+								CURRENT_YEAR_RATE: 35,
+								HEDIS_MEASURE: '12-2023'
+							}
+						]);
+
+						setSelectListMeasure2([
+							{
+								NAME: 'DR. A',
+								MEASURES: 'AAB',
+								VALUE: 15
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'AAB',
+								VALUE: 20
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'COL',
+								VALUE: 35
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'COL',
+								VALUE: 25
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'HBD',
+								VALUE: 40
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'HBD',
+								VALUE: 10
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'W30',
+								VALUE: 70
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'W30',
+								VALUE: 45
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'SAA',
+								VALUE: 5
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'SAA',
+								VALUE: 8
+							}
+						]);
+					}
+					setLoading(false);
+				}
+			} catch (error) {
+				console.log(error);
+			}
+		})();
+		return () => {
+			isLoading = true;
+		};
 	}, []);
+
+	const configLine = {
+		data: selectListMeasure,
+		padding: 'auto',
+		xField: 'HEDIS_MEASURE',
+		yField: 'CURRENT_YEAR_RATE',
+		yAxis: {
+			max: 100
+		}
+	};
+
+	const configBar = {
+		data: selectListMeasure2,
+		isGroup: true,
+		padding: 'auto',
+		xField: 'MEASURES',
+		yField: 'VALUE',
+		seriesField: 'NAME',
+		yAxis: {
+			max: 100
+		}
+	};
+
+	const DemoGauge = () => {
+		const config = {
+			percent: 0.75,
+			range: {
+				ticks: [0, 1 / 3, 2 / 3, 1],
+				color: ['#F4664A', '#FAAD14', '#30BF78'],
+			},
+			indicator: {
+				pointer: {
+					style: {
+						stroke: '#D0D0D0',
+					},
+				},
+				pin: {
+					style: {
+						stroke: '#D0D0D0',
+					},
+				},
+			},
+			statistic: {
+				content: {
+					style: {
+						fontSize: '36px',
+						lineHeight: '36px',
+					},
+				},
+			},
+		};
+		return <Gauge {...config} />;
+	};
+
+	if (loading) {
+		return (
+			<div className="flex min-h-screen w-full items-center justify-center">
+				<Spin
+					indicator={<LoadingOutlined style={{ fontSize: 32 }} spin />}
+					tip={<div className="font-medium">Loading...</div>}
+					className="space-y-3 text-blue-500"
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<Layout>
 			<Layout.Header className="fixed z-10 flex w-full items-center bg-white shadow">
 				<div className="flex flex-1 items-center justify-between">
-					<div
-						className="flex cursor-pointer items-center space-x-4"
-						onClick={() => {
-							if (Auth.role === role.provider) {
-								navigate('/reports/rate-sheet-provider');
-							} else {
-								navigate('/');
-							}
-						}}
-					>
+					<div className="flex cursor-pointer items-center space-x-4" onClick={() => navigate('/')}>
 						<div className="relative flex h-14 w-14">
 							<img src={Logo} alt="" />
 						</div>
@@ -53,32 +250,191 @@ function RateSheetProvider() {
 							mode="horizontal"
 							defaultSelectedKeys={['dashboard']}
 							className="flex-1 justify-end"
-							items={menuRole(Auth?.role)}
+							items={Auth?.role?.includes('admin') ? ADMIN_MENUITEMS : MENUITEMS}
 						/>
 					</div>
 				</div>
 			</Layout.Header>
 			<Layout.Content className="h-full min-h-screen bg-slate-50 px-4 pt-16">
-				<div className="m-auto mt-6 max-w-screen-xl space-y-6">
-					<section>
-						<div className="flex space-x-6">
-							{step === 0 && (
-								<ProviderListTable setStep={setStep} setProviderListRecord={setProviderListRecord} />
-							)}
-							{step === 1 && (
-								<ProviderMemberListTable
-									setStep={setStep}
-									setProviderMemberListRecord={setProviderMemberListRecord}
-									providerListRecord={providerListRecord}
-								/>
-							)}
-						</div>
+				<div className="m-auto my-6 max-w-screen-xl">
+					<section id="goalTracker-content">
+						<Row gutter={[24, 24]}>
+							<Col xl={6} sm={12}>
+								<div className="h-full w-full  rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-300 p-7 shadow-lg">
+									<Statistic
+										title="Provider Benchmark"
+										value={78}
+										loading={loading}
+									/>
+								</div>
+							</Col>
+							<Col xl={6} sm={12}>
+								<div className="h-full w-full rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-300 p-7 shadow-lg">
+									<Statistic
+										title="Total Member List"
+										value={50}
+										className="flex flex-col justify-between"
+										loading={loading}
+									/>
+								</div>
+							</Col>
+							<Col xl={4} sm={8}>
+								<div className="h-full w-full   rounded-2xl bg-cyan-500 p-6 shadow-lg">
+									<Statistic
+										title="< 2% to reach goal"
+										value={statistics.to_reach_goal_2}
+										loading={loading}
+									/>
+									<Progress
+										autoFit={false}
+										height={24}
+										color={['#0e7490', 'white']}
+										percent={statistics.to_reach_goal_2 / statistics.number_measure}
+									/>
+								</div>
+							</Col>
+							<Col xl={4} sm={8}>
+								<div className="h-full w-full  rounded-2xl bg-sky-500 p-6 shadow-lg">
+									<Statistic
+										title="2.1-5% to reach goal"
+										value={statistics.to_reach_goal_2_5}
+										loading={loading}
+									/>
+									<Progress
+										autoFit={false}
+										height={24}
+										color={['#0369a1', 'white']}
+										percent={statistics.to_reach_goal_2_5 / statistics.number_measure}
+									/>
+								</div>
+							</Col>
+							<Col xl={4} sm={8}>
+								<div className="h-full w-full rounded-2xl bg-blue-500 p-6 shadow-lg">
+									<Statistic
+										title="> 5% to reach goal"
+										value={statistics.to_reach_goal_5}
+										loading={loading}
+									/>
+									<Progress
+										autoFit={false}
+										height={24}
+										color={['#1d4ed8', 'white']}
+										percent={statistics.to_reach_goal_5 / statistics.number_measure}
+									/>
+								</div>
+							</Col>
+
+							<Col xl={18} xs={24}>
+								<div className="w-full rounded-2xl bg-white p-6  shadow-lg">
+									<div className="flex items-center space-x-4">
+										<div className="mb-4 text-xl font-medium">Performance</div>
+										<div className="mb-4">
+											<Cascader
+												options={selectOptions}
+												defaultValue={selectMeasure}
+												showSearch={{
+													filter
+												}}
+												onChange={value => {
+													setSelectMeasure(value);
+													statistics.rate_bar_chart.map(data => {
+														if (data.HEDIS_MEASURE === value[0]) {
+															setSelectListMeasure([
+																{
+																	CURRENT_YEAR_RATE: 0,
+																	HEDIS_MEASURE: '10-2022'
+																},
+																{
+																	CURRENT_YEAR_RATE: data.CURRENT_YEAR_RATE,
+																	HEDIS_MEASURE: '11-2022'
+																}
+															]);
+														}
+													});
+												}}
+												placeholder="Please select"
+											/>
+										</div>
+									</div>
+									<Line {...configLine} />
+								</div>
+							</Col>
+
+							<Col xl={6} xs={24}>
+								<div className="h-full w-full rounded-2xl bg-white px-6 py-10 shadow-lg">
+									<div className="mb-4 text-xl font-medium">Recent Update</div>
+									<div className=" space-y-2 overflow-auto">
+										{PROJECTLIST.map(data => (
+											<>
+												<div
+													onClick={() => {
+														localStorage.setItem('database', data.database);
+														window.location.reload();
+													}}
+													className={`flex cursor-pointer items-center space-x-3 rounded p-2 transition-all duration-200 hover:bg-slate-50 ${localStorage.getItem('database') === data.database &&
+														'bg-slate-100 hover:bg-slate-100'
+														}`}
+												>
+													<TeamOutlined style={{ fontSize: `32px` }} />
+
+													<div className="overflow-hidden">
+														<div className="overflow-hidden text-ellipsis whitespace-nowrap">
+															{data.title}
+														</div>
+														<div className="text-gray-400">
+															Last updated: {dayjs(data.date).format('MM/DD/YYYY')}
+														</div>
+													</div>
+												</div>
+												<Divider />
+											</>
+										))}
+									</div>
+								</div>
+							</Col>
+
+							<Col xl={24} xs={24}>
+								<div className="w-full rounded-2xl bg-white p-6  shadow-lg">
+									<div className="flex items-center space-x-4">
+										<div className="mb-4 text-xl font-medium">Comparison</div>
+										<div className="mb-4">
+											<Cascader
+												options={selectOptions}
+												defaultValue={selectMeasure}
+												showSearch={{
+													filter
+												}}
+												onChange={value => {
+													setSelectMeasure(value);
+													statistics.rate_bar_chart.map(data => {
+														if (data.HEDIS_MEASURE === value[0]) {
+															setSelectListMeasure([
+																{
+																	CURRENT_YEAR_RATE: 0,
+																	HEDIS_MEASURE: '10-2022'
+																},
+																{
+																	CURRENT_YEAR_RATE: data.CURRENT_YEAR_RATE,
+																	HEDIS_MEASURE: '11-2022'
+																}
+															]);
+														}
+													});
+												}}
+												placeholder="Please select"
+											/>
+										</div>
+									</div>
+									<Column {...configBar} />
+								</div>
+							</Col>
+						</Row>
 					</section>
 				</div>
 			</Layout.Content>
 			{/* <Layout.Footer></Layout.Footer> */}
-		</Layout>
+		</Layout >
 	);
 }
 
-export default RateSheetProvider;
+export default GoalTracker;
