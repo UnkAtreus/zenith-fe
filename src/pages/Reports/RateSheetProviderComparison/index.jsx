@@ -101,7 +101,7 @@ function GoalTracker() {
 							},
 							{
 								CURRENT_YEAR_RATE: 35,
-								HEDIS_MEASURE: '12-2023'
+								HEDIS_MEASURE: '2-2023'
 							}
 						]);
 
@@ -155,8 +155,39 @@ function GoalTracker() {
 								NAME: 'DR. B',
 								MEASURES: 'SAA',
 								VALUE: 8
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'AAP',
+								VALUE: 12
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'AAP',
+								VALUE: 22
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'ACP',
+								VALUE: 33
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'ACP',
+								VALUE: 23
+							},
+							{
+								NAME: 'DR. A',
+								MEASURES: 'URI',
+								VALUE: 19
+							},
+							{
+								NAME: 'DR. B',
+								MEASURES: 'URI',
+								VALUE: 30
 							}
 						]);
+
 					}
 					setLoading(false);
 				}
