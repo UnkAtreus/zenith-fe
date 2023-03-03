@@ -156,6 +156,14 @@ export const ADMIN_MENUITEMS = [
 	},
 	{
 		label: [
+			<Link to="/Reports/rate-sheet-provider-comparison" key="Comparison">
+				Provider Comparison
+			</Link>
+		],
+		key: 'Comparison'
+	},
+	{
+		label: [
 			<Link to="/manage-users" key="manage-users">
 				Manage Users
 			</Link>
