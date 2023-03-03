@@ -279,7 +279,7 @@ function GoalTracker() {
 					<div className="flex flex-1 justify-end">
 						<Menu
 							mode="horizontal"
-							defaultSelectedKeys={['dashboard']}
+							defaultSelectedKeys={['Comparison']}
 							className="flex-1 justify-end"
 							items={Auth?.role?.includes('admin') ? ADMIN_MENUITEMS : MENUITEMS}
 						/>
@@ -293,7 +293,7 @@ function GoalTracker() {
 							<Col xl={6} sm={12}>
 								<div className="h-full w-full  rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-300 p-7 shadow-lg">
 									<Statistic
-										title="Provider Benchmark"
+										title="Need to Change"
 										value={78}
 										loading={loading}
 									/>

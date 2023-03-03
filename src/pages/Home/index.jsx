@@ -168,13 +168,6 @@ function Home() {
 							Rate Sheet by Provider
 						</div>
 
-						<div
-							onClick={() => navigate('/reports/rate-sheet-provider-comparison')}
-							className="w-full cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap rounded-lg bg-gradient-to-r from-indigo-500 to-indigo-400 p-4 text-sm font-medium text-white transition-all duration-200 hover:bg-opacity-80"
-						>
-							Rate Sheet by Provider Comparison
-						</div>
-
 						{Auth.schema !== 'cbh' && (
 							<div
 								onClick={() => navigate('/reports/gaps-in-care')}

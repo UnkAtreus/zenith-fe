@@ -106,6 +106,14 @@ export const MENUITEMS = [
 			</Link>
 		],
 		key: 'goal-tracker'
+	},
+	{
+		label: [
+			<Link to="/Reports/rate-sheet-provider-comparison" key="Comparison">
+				Provider Comparison
+			</Link>
+		],
+		key: 'Comparison'
 	}
 	// {
 	// 	label: [
