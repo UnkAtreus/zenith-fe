@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import MemberDetailService from '@/service/memberDetail';
 import { FCTMEASOUT } from '@/store/table_column';
 import makeColumn from '@/utilities/makeColumn';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function MemberDetailTable({ setStep, memberListRecord, ratesummaryRecord }) {
 	const [data, setData] = useState([]);
@@ -35,6 +36,16 @@ function MemberDetailTable({ setStep, memberListRecord, ratesummaryRecord }) {
 						) {
 							return {
 								...col,
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								sorter: (a, b) => {
+									if (a[col.key] && b[col.key]) {
+										return dayjs(a[col.key]) - dayjs(b[col.key]);
+									} else {
+										return 0;
+									}
+								},
+								onFilter: (value, record) => record[col.key].includes(value),
 								render: (text, record) => {
 									if (text) {
 										return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
@@ -55,7 +66,31 @@ function MemberDetailTable({ setStep, memberListRecord, ratesummaryRecord }) {
 								render: (text, record) => null
 							};
 						}
-						return col;
+						if (col.key === 'DBLLINENBR') {
+							return {
+								...col,
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								onFilter: (value, record) => {
+									if (record[col.key]) return record[col.key].includes(value);
+								},
+								sorter: (a, b) => {
+									if (a[col.key] && b[col.key]) {
+										return a[col.key] - b[col.key];
+									} else {
+										return 0;
+									}
+								}
+							};
+						}
+						return {
+							...col,
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							onFilter: (value, record) => {
+								if (record[col.key]) return record[col.key].includes(value);
+							}
+						};
 					});
 					setColumn(column);
 				})
@@ -133,7 +168,9 @@ function MemberDetailTable({ setStep, memberListRecord, ratesummaryRecord }) {
 			<div className="px-6 pb-6">
 				<div className=" py-4">
 					<Table
-						rowKey={record => `${TABLE_KEY}_${record.CHVMEMNBR}_${record.CHVCLAIMID}_${record.CHVPROVNBR}`}
+						rowKey={record =>
+							`${TABLE_KEY}_${record.CHVMEMNBR}_${record.CHVCLAIMID}_${record.CHVPROVNBR}_${record.DBLLINENBR}`
+						}
 						columns={column}
 						dataSource={data}
 						scroll={{ x: 'max-content' }}

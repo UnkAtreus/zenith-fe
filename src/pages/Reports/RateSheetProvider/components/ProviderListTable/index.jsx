@@ -243,12 +243,13 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
-					width: 360,
+					width: 512,
 					filters: makeDropdown(makeFilterList(data, 'HEDIS_MEASURE')),
 					filterSearch: true,
 					onFilter: (value, record) => {
 						if (record.HEDIS_MEASURE !== null) return record.HEDIS_MEASURE.toString().includes(value);
 					},
+
 					render: (text, record) => {
 						if (MEASURE[record.MEASURE]) {
 							return (
@@ -291,6 +292,12 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					filters: makeDropdown(makeFilterList(data, col.key)),
+					filterSearch: true,
+					sorter: (a, b) => a[col.key].length - b[col.key].length,
+					onFilter: (value, record) => {
+						if (record[col.key]) return record[col.key].includes(value);
+					},
 					render: (text, record) => {
 						return <div>{text}</div>;
 					}
@@ -301,6 +308,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					title: 'Den.'
 					// render: (text, record) => {
 					// 	return <div>0</div>;
@@ -311,6 +319,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					title: 'Num.'
 					// render: (text, record) => {
 					// 	return <div>0</div>;
@@ -322,6 +331,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					render: (text, record) => (
 						<div key={text + record} className=" whitespace-nowrap">
 							{((record.NUM / record.DEN) * 100).toFixed(1)} %
@@ -339,6 +349,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					render: (text, record) => <div>0.0%</div>
 					// <div key={text + record} className=" whitespace-nowrap">
 					// 	{(text * 100).toFixed(1)} %
@@ -349,6 +360,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					render: (text, record) => (
 						<div>0.0%</div>
 						// <div key={text + record} className=" whitespace-nowrap">
@@ -368,6 +380,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 				return {
 					...col,
 					className: 'provider-list-table-column',
+					sorter: (a, b) => a[col.key] - b[col.key],
 					render: (text, record) => (
 						<div>0.0%</div>
 						// <div key={text + record}>
@@ -386,7 +399,10 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					className: 'provider-list-table-column',
 					filters: makeDropdown(makeFilterList(data, 'NPI')),
 					filterSearch: true,
-					onFilter: (value, record) => record.NPI.includes(value)
+					onFilter: (value, record) => {
+						if (record[col.key]) return record[col.key].includes(value);
+					},
+					sorter: (a, b) => a[col.key] - b[col.key]
 				};
 			}
 
@@ -396,7 +412,10 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					className: 'provider-list-table-column',
 					filters: makeDropdown(makeFilterList(data, 'TIN')),
 					filterSearch: true,
-					onFilter: (value, record) => record.TIN.includes(value)
+					onFilter: (value, record) => {
+						if (record[col.key]) return record[col.key].includes(value);
+					},
+					sorter: (a, b) => a[col.key] - b[col.key]
 				};
 			}
 
@@ -406,7 +425,10 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					className: 'provider-list-table-column',
 					filters: makeDropdown(makeFilterList(data, 'FULLNAME')),
 					filterSearch: true,
-					onFilter: (value, record) => record.FULLNAME.includes(value),
+					onFilter: (value, record) => {
+						if (record[col.key]) return record[col.key].includes(value);
+					},
+					sorter: (a, b) => a[col.key].length - b[col.key].length,
 					render: (text, record) => (
 						<div key={text + record} onClick={() => setStep(1)} className="cursor-pointer text-blue-500">
 							{text}
@@ -416,6 +438,11 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 			}
 			return {
 				...col,
+				filters: makeDropdown(makeFilterList(data, col.key)),
+				filterSearch: true,
+				onFilter: (value, record) => {
+					if (record[col.key]) return record[col.key].includes(value);
+				},
 				className: 'provider-list-table-column'
 			};
 		});

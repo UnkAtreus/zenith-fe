@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import ProviderList from '@/service/providerList';
 import { GAPS_IN_CARE } from '@/store/table_column';
 import makeColumn from '@/utilities/makeColumn';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function ProviderMemberListTable({ setStep, setProviderMemberListRecord, providerListRecord }) {
 	const [data, setData] = useState([]);
@@ -67,6 +68,10 @@ function ProviderMemberListTable({ setStep, setProviderMemberListRecord, provide
 						return {
 							...col,
 							className: 'provider-list-table-column',
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							sorter: (a, b) => a[col.key].length - b[col.key].length,
+							onFilter: (value, record) => record[col.key].includes(value),
 							render: (text, record) => {
 								if (text) {
 									return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
@@ -74,89 +79,24 @@ function ProviderMemberListTable({ setStep, setProviderMemberListRecord, provide
 							}
 						};
 					}
-
-					if (col.key === 'NUMTAG') {
+					if (col.key === 'CHVMEMNBR') {
 						return {
 							...col,
 							className: 'provider-list-table-column',
-							render: (text, record) => {
-								return <div>{text}</div>;
-							}
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							sorter: (a, b) => a[col.key] - b[col.key],
+							onFilter: (value, record) => record[col.key].includes(value)
 						};
 					}
-
-					if (col.key === 'DEN') {
+					if (col.key === 'FULLNAME') {
 						return {
 							...col,
 							className: 'provider-list-table-column',
-							title: 'Den.'
-							// render: (text, record) => {
-							// 	return <div>0</div>;
-							// }
-						};
-					}
-					if (col.key === 'NUM') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							title: 'Num.'
-							// render: (text, record) => {
-							// 	return <div>0</div>;
-							// }
-						};
-					}
-
-					if (col.key === 'CURRENT_YEAR_RATE') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => <div>0.0 %</div>
-							// 	<div key={text + record} className=" whitespace-nowrap">
-							// 		{(text * 100).toFixed(1)} %
-							// 	</div>
-						};
-					}
-					if (col.key === 'SHORT_HEDIS_MEASURE') {
-						return {
-							...col,
-							className: 'hidden'
-						};
-					}
-					if (col.key === 'PRIOR_YEAR_RATE') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => <div>0.0%</div>
-							// <div key={text + record} className=" whitespace-nowrap">
-							// 	{(text * 100).toFixed(1)} %
-							// </div>
-						};
-					}
-					if (col.key === 'GOAL') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => (
-								<div>0.0%</div>
-								// <div key={text + record} className=" whitespace-nowrap">
-								// 	{(text * 100).toFixed(1)} %
-								// </div>
-							)
-						};
-					}
-					if (col.key === 'TO_REACH_GOAL') {
-						return {
-							...col,
-							className: 'provider-list-table-column',
-							render: (text, record) => (
-								<div>0.0%</div>
-								// <div key={text + record}>
-								// 	{Math.ceil(
-								// 		record.GOAL * (parseFloat(record.DENOMINATOR) - parseFloat(record.NUMERATOR))
-								// 	) || 0}
-								// </div>
-							),
-							title: 'To reach goal'
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							sorter: (a, b) => a[col.key].length - b[col.key].length,
+							onFilter: (value, record) => record[col.key].includes(value)
 						};
 					}
 
@@ -164,7 +104,15 @@ function ProviderMemberListTable({ setStep, setProviderMemberListRecord, provide
 						return {
 							...col,
 							className: 'provider-list-table-column',
+							filters: [
+								{ text: 'Compliant', value: 1 },
+								{ text: 'Not Compliant', value: null }
+							],
+							filterSearch: true,
+							sorter: (a, b) => a.COMPLIANTSTATUS - b.COMPLIANTSTATUS,
+							onFilter: (value, record) => record.COMPLIANTSTATUS === value,
 							render: (text, record) => {
+								console.log(text);
 								if (record.COMPLIANTSTATUS === 1) {
 									return <div>Compliant</div>;
 								} else {
@@ -181,6 +129,9 @@ function ProviderMemberListTable({ setStep, setProviderMemberListRecord, provide
 
 					return {
 						...col,
+						filters: makeDropdown(makeFilterList(data, col.key)),
+						filterSearch: true,
+						onFilter: (value, record) => record[col.key].includes(value),
 						className: 'provider-list-table-column'
 					};
 				});

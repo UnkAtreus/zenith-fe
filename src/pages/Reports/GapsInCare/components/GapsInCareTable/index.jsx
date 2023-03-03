@@ -17,7 +17,7 @@ import {
 	PROVID_PROV,
 	MEM_FULL_PROV
 } from '@/store/table_column';
-import makeDropdown from '@/utilities/makeDropdown';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 	const [data, setData] = useState([]);
@@ -127,6 +127,16 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 						return {
 							...col,
 							className: 'gaps-in-care-table-column',
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							sorter: (a, b) => {
+								if (a[col.key] && b[col.key]) {
+									return dayjs(a[col.key]) - dayjs(b[col.key]);
+								} else {
+									return 0;
+								}
+							},
+							onFilter: (value, record) => record[col.key].includes(value),
 							render: (text, record) => {
 								if (text) {
 									return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
@@ -135,16 +145,16 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 						};
 					}
 					// firstname lastname
-					if (col.key === 'PROV_FULLNAME') {
+					if (col.key === 'MEM_FULLNAME') {
 						return {
 							...col,
 							className: 'gaps-in-care-table-column',
-							width: 110,
-							filters: filter2,
+							filters: makeDropdown(makeFilterList(data, col.key)),
 							filterSearch: true,
 							onFilter: (value, record) => {
-								if (record.PROV_FULLNAME !== null) return record.PROV_FULLNAME.includes(value);
+								if (record[col.key]) return record[col.key].includes(value);
 							},
+							sorter: (a, b) => a[col.key].length - b[col.key].length,
 							render: (text, record) => (
 								<div
 									key={text + record}
@@ -158,26 +168,24 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 						};
 					}
 
-					// if (
-					// 	col.key === 'MEMBER_ID' ||
-					// 	col.key === 'CHVMEMNBR' ||
-					// 	col.key === 'CHVCLAIMID' ||
-					// 	col.key === 'CHVPROVNBR' ||
-					// 	col.key === 'PROVIDER_ID'
-					// ) {
-					// 	return {
-					// 		...col,
-					// 		className: 'gaps-in-care-table-column',
-					// 		render: (text, record) => null
-					// 	};
-					// }
-
-					if (col.key === 'PROV_ADDRESS') {
+					if (
+						col.key === 'MEMBER_ID' ||
+						col.key === 'CHVMEMNBR' ||
+						col.key === 'CHVCLAIMID' ||
+						col.key === 'CHVPROVNBR' ||
+						col.key === 'TIN' ||
+						col.key === 'AGE' ||
+						col.key === 'NPI'
+					) {
 						return {
 							...col,
-							className: 'gaps-in-care-table-column'
-							// width: 10
-							// render: (text, record) => <div>1234</div>
+							className: 'gaps-in-care-table-column',
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							onFilter: (value, record) => {
+								if (record[col.key]) return record[col.key].includes(value);
+							},
+							sorter: (a, b) => a[col.key] - b[col.key]
 						};
 					}
 
@@ -214,6 +222,11 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 
 					return {
 						...col,
+						filters: makeDropdown(makeFilterList(data, col.key)),
+						filterSearch: true,
+						onFilter: (value, record) => {
+							if (record[col.key]) return record[col.key].includes(value);
+						},
 						className: 'gaps-in-care-table-column'
 						// width: 60
 					};
@@ -256,7 +269,7 @@ function GapsInCareTable({ setStep, setGapsInCareRecord }) {
 						scroll={{ x: 'max-content' }}
 						tableLayout={'auto'}
 						rowKey={record =>
-							`${record.TIN}_${record.PROVIDER_ID}_${record.CHVMEMNBR}_${record.NPI}_${record.MEASURE}`
+							`${record.TIN}_${record.PROVIDER_ID}_${record.CHVMEMNBR}_${record.NPI}_${record.MEASURE}_${record.NUMTAG}`
 						}
 						loading={isLoading}
 						pagination={{

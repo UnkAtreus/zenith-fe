@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 import RateSummaryService from '@/service/rateSummary';
 import { MEASURE, MEASURE_ID, RATE_SUMMARY, SUB_MEASURE } from '@/store/table_column';
-import makeDropdown from '@/utilities/makeDropdown';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 	const [data, setData] = useState([]);
@@ -152,6 +152,16 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 								filterMode: 'tree',
 								filterSearch: true,
 								onFilter: (value, record) => record.SHORT_HEDIS_MEASURE.startsWith(value),
+								sorter: (a, b) => {
+									if (MEASURE[a.SHORT_HEDIS_MEASURE] && MEASURE[b.SHORT_HEDIS_MEASURE]) {
+										return (
+											MEASURE[a.SHORT_HEDIS_MEASURE].length -
+											MEASURE[b.SHORT_HEDIS_MEASURE].length
+										);
+									} else {
+										return a.SHORT_HEDIS_MEASURE.length - b.SHORT_HEDIS_MEASURE.length;
+									}
+								},
 								render: (text, record) => (
 									<div
 										key={text + record}
@@ -176,6 +186,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) => a[col.key] - b[col.key],
 								title: 'Den.'
 							};
 						}
@@ -183,6 +194,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) => a[col.key] - b[col.key],
 								title: 'Num.'
 							};
 						}
@@ -191,6 +203,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) => a[col.key] - b[col.key],
 								render: (text, record) => (
 									<div key={text + record} className=" whitespace-nowrap">
 										{(text * 100).toFixed(1)} %
@@ -208,6 +221,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) => a[col.key] - b[col.key],
 								render: (text, record) => (
 									<div key={text + record} className=" whitespace-nowrap">
 										{(text * 100).toFixed(1)} %
@@ -219,6 +233,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) => a[col.key] - b[col.key],
 								render: (text, record) => (
 									<div key={text + record} className=" whitespace-nowrap">
 										{(text * 100).toFixed(1)} %
@@ -230,6 +245,9 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								sorter: (a, b) =>
+									Math.ceil(a.GOAL * (parseFloat(a.DENOMINATOR) - parseFloat(a.NUMERATOR))) -
+										Math.ceil(b.GOAL * (parseFloat(b.DENOMINATOR) - parseFloat(b.NUMERATOR))) || 0,
 								render: (text, record) => (
 									<div key={text + record}>
 										{Math.ceil(
@@ -246,13 +264,19 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 							return {
 								...col,
 								className: 'rate-summary-table-column',
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								sorter: (a, b) => {
+									if (SUB_MEASURE[a[col.key]] && SUB_MEASURE[b[col.key]]) {
+										return SUB_MEASURE[a[col.key]].length - SUB_MEASURE[b[col.key]].length;
+									} else {
+										return a[col.key].length - b[col.key].length;
+									}
+								},
+								onFilter: (value, record) => {
+									if (record[col.key]) return record[col.key].includes(value);
+								},
 								render: (text, record) => {
-									if (text === 'AMM_ECPT') {
-										return <div key={text + record}>Effective Continuation Phase Treatment</div>;
-									}
-									if (text === 'AMM_EAPT') {
-										return <div key={text + record}>Effective Acute Phase Treatment</div>;
-									}
 									return <div key={text + record}>{SUB_MEASURE[text] || text}</div>;
 								}
 							};

@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import FctmeasoutService from '@/service/fctmeasout';
 import { GAPS_IN_CARE, SUB_MEASURE_FULL } from '@/store/table_column';
 import makeColumn from '@/utilities/makeColumn';
+import makeDropdown, { makeFilterList } from '@/utilities/makeDropdown';
 
 function MemberListTable({ setStep, ratesummaryRecord, setMemberListRecord }) {
 	const [data, setData] = useState([]);
@@ -69,6 +70,10 @@ function MemberListTable({ setStep, ratesummaryRecord, setMemberListRecord }) {
 							return {
 								...col,
 								className: 'member-list-table-column',
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								sorter: (a, b) => dayjs(a[col.key]) - dayjs(b[col.key]),
+								onFilter: (value, record) => record[col.key].includes(value),
 								render: (text, record) => {
 									if (text) {
 										return <div>{dayjs(text).format('MMM DD,YYYY')}</div>;
@@ -79,6 +84,21 @@ function MemberListTable({ setStep, ratesummaryRecord, setMemberListRecord }) {
 						if (col.key === 'MEMBER_NAME') {
 							return {
 								...col,
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								sorter: (a, b) => a[col.key].length - b[col.key].length,
+								onFilter: (value, record) => record[col.key].includes(value),
+								className: 'member-list-table-column'
+								// render: (text, record) => <div>John Doe</div>
+							};
+						}
+						if (col.key === 'MEMBER_ID') {
+							return {
+								...col,
+								filters: makeDropdown(makeFilterList(data, col.key)),
+								filterSearch: true,
+								sorter: (a, b) => a[col.key] - b[col.key],
+								onFilter: (value, record) => record[col.key].includes(value),
 								className: 'member-list-table-column'
 								// render: (text, record) => <div>John Doe</div>
 							};
@@ -92,6 +112,11 @@ function MemberListTable({ setStep, ratesummaryRecord, setMemberListRecord }) {
 						// }
 						return {
 							...col,
+							filters: makeDropdown(makeFilterList(data, col.key)),
+							filterSearch: true,
+							onFilter: (value, record) => {
+								if (record[col.key]) return record[col.key].includes(value);
+							},
 							className: 'member-list-table-column'
 						};
 					});
@@ -161,7 +186,7 @@ function MemberListTable({ setStep, ratesummaryRecord, setMemberListRecord }) {
 					<Table
 						columns={column}
 						dataSource={data}
-						scroll={{ x: 'max-content' }}
+						// scroll={{ x: 'max-content' }}
 						rowKey={record => record.MEMBER_ID + Math.random() * 1000000}
 						onRow={(record, rowIndex) => {
 							return {
