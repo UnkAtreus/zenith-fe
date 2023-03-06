@@ -293,7 +293,7 @@ function GoalTracker() {
 							<Col xl={6} sm={12}>
 								<div className="h-full w-full  rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-300 p-7 shadow-lg">
 									<Statistic
-										title="Need to Change"
+										title="Average performace score by TIN"
 										value={78}
 										loading={loading}
 									/>
@@ -302,7 +302,7 @@ function GoalTracker() {
 							<Col xl={6} sm={12}>
 								<div className="h-full w-full rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-300 p-7 shadow-lg">
 									<Statistic
-										title="Total Member List"
+										title="Average performace score by NPI"
 										value={50}
 										className="flex flex-col justify-between"
 										loading={loading}
