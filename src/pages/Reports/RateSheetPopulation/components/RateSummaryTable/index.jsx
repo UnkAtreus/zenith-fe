@@ -19,8 +19,6 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 		perPage: 50
 	});
 
-	const filter_meature = makeDropdown(MEASURE_ID);
-
 	const navigate = useNavigate();
 
 	const haldleExport = () => {
@@ -148,7 +146,7 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 								...col,
 								className: 'rate-summary-table-column',
 								width: 360,
-								filters: filter_meature,
+								filters: makeDropdown(makeFilterList(data, 'SHORT_HEDIS_MEASURE')),
 								filterMode: 'tree',
 								filterSearch: true,
 								onFilter: (value, record) => record.SHORT_HEDIS_MEASURE.startsWith(value),
