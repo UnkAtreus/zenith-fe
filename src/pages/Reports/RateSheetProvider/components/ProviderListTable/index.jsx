@@ -445,7 +445,7 @@ function ProviderListTable({ setStep, setProviderListRecord }) {
 					</Breadcrumb>
 				}
 				extra={[
-					<Button onClick={() => navigate('/reports/rate-sheet-provider-comparison')} key="btn_01" type="primary">
+					<Button onClick={() => navigate('/reports/rate-sheet-provider-comparison')} key="btn_01" type="primary" danger>
 						Provider Comparison
 					</Button>,
 					<Button onClick={() => haldleExport()} key="btn_1" type="primary">
