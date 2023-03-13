@@ -147,7 +147,6 @@ function RateSummaryTable({ setStep, setRateSummaryRecord }) {
 								className: 'rate-summary-table-column',
 								width: 360,
 								filters: makeDropdown(makeFilterList(data, 'SHORT_HEDIS_MEASURE')),
-								filterMode: 'tree',
 								filterSearch: true,
 								onFilter: (value, record) => record.SHORT_HEDIS_MEASURE.startsWith(value),
 								sorter: (a, b) => {
