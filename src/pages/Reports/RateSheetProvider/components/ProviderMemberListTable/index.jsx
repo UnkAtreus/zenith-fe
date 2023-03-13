@@ -70,7 +70,13 @@ function ProviderMemberListTable({ setStep, setProviderMemberListRecord, provide
 							className: 'provider-list-table-column',
 							filters: makeDropdown(makeFilterList(data, col.key)),
 							filterSearch: true,
-							sorter: (a, b) => a[col.key].length - b[col.key].length,
+							sorter: (a, b) => {
+								if (a[col.key] && b[col.key]) {
+									return dayjs(a[col.key]) - dayjs(b[col.key]);
+								} else {
+									return 0;
+								}
+							},
 							onFilter: (value, record) => record[col.key].includes(value),
 							render: (text, record) => {
 								if (text) {
